@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Real-Time Blood Inventory</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fff; }
+    .container { width: 700px; margin: 60px auto; }
+    h1 { font-size: 26px; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background: #f2f2f2; }
+    .good { color: green; font-weight: bold; }
+    .moderate { color: orange; font-weight: bold; }
+    .low { color: #d97706; font-weight: bold; }
+    .critical { color: red; font-weight: bold; }
+    .back { margin-bottom: 15px; display: inline-block; }
+    .footer { margin-top: 10px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="hospital-profile.html" class="back">← Back to Hospital Profile</a>
+    <h1>Real-Time Blood Inventory</h1>
+
+    <table>
+      <tr><th>Type</th><th>Unit(s)</th><th>Status</th></tr>
+      <tr><td>O+</td><td>450</td><td class="good">Good</td></tr>
+      <tr><td>A+</td><td>320</td><td class="good">Good</td></tr>
+      <tr><td>B+</td><td>180</td><td class="moderate">Moderate</td></tr>
+      <tr><td>AB+</td><td>75</td><td class="low">Low</td></tr>
+      <tr><td>O-</td><td>200</td><td class="moderate">Moderate</td></tr>
+      <tr><td>A-</td><td>120</td><td class="low">Low</td></tr>
+      <tr><td>B-</td><td>80</td><td class="critical">Critical</td></tr>
+      <tr><td>AB-</td><td>35</td><td class="critical">Critical</td></tr>
+    </table>
+
+    <div class="footer">Total: 1,450 units | Low Stock: AB-, B-</div>
+  </div>
+</body>
+</html>

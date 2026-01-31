@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Feedback</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .container { width: 800px; margin: 50px auto; }
+    .back { text-decoration:none; color:#000; display:inline-block; margin-bottom:20px; }
+
+    .feedback-box {
+      border:1px solid #000;
+      padding:15px;
+      margin-bottom:15px;
+    }
+
+    .response-btn {
+      display:inline-block;
+      margin-top:10px;
+      padding:4px 10px;
+      border:1px solid #000;
+      text-decoration:none;
+      color:#000;
+      font-size:14px;
+    }
+
+    .pagination {
+      margin-top:20px;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>View Feedback</h1>
+  <a href="feedback.html" class="back">← Back to feedback</a>
+
+  <div class="feedback-box">
+    <strong>Name (xxxx@gmail.com)</strong>
+    <p>The check-in process was too slow at the event</p>
+    <a href="respond-feedback.html" class="response-btn">Response</a>
+  </div>
+
+  <div class="feedback-box">
+    <strong>Name (xxxx@gmail.com)</strong>
+    <p>I encountered a rude staff member at the hospital</p>
+    <a href="respond-feedback.html" class="response-btn">Response</a>
+  </div>
+
+  <div class="feedback-box">
+    <strong>Name (xxxx@gmail.com)</strong>
+    <p>The system runs slow when I update my blood type information</p>
+    <a href="respond-feedback.html" class="response-btn">Response</a>
+  </div>
+
+  <div class="pagination">
+    <a href="#" class="page">‹</a>
+    <a href="#" class="page">1</a>
+    <a href="#" class="page">2</a>
+    <a href="#" class="page">3</a>
+    <a href="#" class="page">›</a>
+    <p>showing 1 to 3 feedback</p>
+  </div>
+</div>
+
+</body>
+</html>

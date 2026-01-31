@@ -1,0 +1,144 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .container { width: 1000px; margin: 50px auto; }
+    .back { text-decoration:none; color:#000; display:inline-block; margin-bottom:20px; }
+
+    .tabs {
+      display:flex;
+      gap:10px;
+      margin-bottom:20px;
+    }
+
+    .tab {
+      border:1px solid #000;
+      padding:6px 12px;
+    }
+
+    .top-bar {
+      display:flex;
+      justify-content: space-between;
+      margin-bottom:20px;
+    }
+
+    input {
+      padding:6px;
+      width:250px;
+    }
+
+    .table-wrapper {
+      border:1px solid #000;
+      padding:20px;
+    }
+
+    table {
+      width:100%;
+      border-collapse: collapse;
+      margin-top:10px;
+    }
+
+    th, td {
+      border:1px solid #000;
+      padding:10px;
+      text-align:left;
+    }
+
+    .pagination {
+      display:flex;
+      justify-content: space-between;
+      margin-top:20px;
+      align-items:center;
+    }
+
+    .page {
+      border:1px solid #000;
+      padding:4px 8px;
+      margin-right:4px;
+      text-decoration:none;
+      color:#000;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Feedback</h1>
+  <a href="admin-dashboard.html" class="back">← Back to Admin Dashboard</a>
+
+  <div class="top-bar">
+    <div class="tabs">
+      <div class="tab">Pending (2)</div>
+      <div class="tab">Resolved (2)</div>
+      <div class="tab">Replied (1)</div>
+    </div>
+
+    <input type="text" placeholder="Search feedback...">
+  </div>
+
+  <div class="table-wrapper">
+    <p>Showing pending feedback</p>
+
+    <table>
+      <tr>
+        <th>Donor</th>
+        <th>Submitted</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+
+      <tr>
+        <td>name</td>
+        <td>Apr 30, 2025</td>
+        <td>Pending</td>
+        <td><a href="view-feedback.html">View</a></td>
+      </tr>
+
+      <tr>
+        <td>name</td>
+        <td>May 20, 2025</td>
+        <td>Pending</td>
+        <td><a href="view-feedback.html">View</a></td>
+      </tr>
+
+      <tr>
+        <td>name</td>
+        <td>Jun 15, 2025</td>
+        <td>Resolved</td>
+        <td><a href="view-feedback.html">View</a></td>
+      </tr>
+
+      <tr>
+        <td>name</td>
+        <td>Jul 10, 2025</td>
+        <td>Replied</td>
+        <td><a href="view-feedback.html">View</a></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <div>
+      <a href="#" class="page">‹</a>
+      <a href="#" class="page">1</a>
+      <a href="#" class="page">2</a>
+      <a href="#" class="page">3</a>
+      <a href="#" class="page">›</a>
+    </div>
+
+    <div>showing 1 to 5 feedback</div>
+
+    <div>
+      <select>
+        <option>5 / page</option>
+        <option>10 / page</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+

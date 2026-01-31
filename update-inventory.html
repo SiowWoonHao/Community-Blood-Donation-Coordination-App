@@ -1,0 +1,39 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Update Blood Inventory</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fff; }
+    .container { width: 420px; margin: 80px auto; }
+    h1 { font-size: 26px; margin-bottom: 30px; }
+    label { display: block; margin-top: 20px; font-size: 14px; }
+    select, input { width: 100%; padding: 10px; margin-top: 5px; }
+    .actions { text-align: center; margin-top: 30px; }
+    button { padding: 10px 20px; margin: 0 10px; }
+    .back { margin-bottom: 20px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="hospital-profile.html" class="back">← Back to Hospital Profile</a>
+    <h1>Update Blood Inventory</h1>
+
+    <label>Select Blood Type</label>
+    <select>
+      <option>O+</option><option>A+</option><option>B+</option><option>AB+</option>
+      <option>O-</option><option>A-</option><option>B-</option><option>AB-</option>
+    </select>
+
+    <label>Enter New Quantity</label>
+    <input type="number" placeholder="e.g. 120">
+
+    <div class="actions">
+      <button onclick="location.href='inventory.html'">Cancel</button>
+      <button>Update</button>
+    </div>
+  </div>
+</body>
+</html>
+
+
+

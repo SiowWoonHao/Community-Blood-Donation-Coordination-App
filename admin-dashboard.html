@@ -1,0 +1,53 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fff; }
+    .container { width: 900px; margin: 60px auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    h1 { font-size: 28px; margin: 0; }
+    .logout {
+      padding: 8px 16px;
+      border: 1px solid #000;
+      text-decoration: none;
+      color: #000;
+      font-size: 14px;
+    }
+    .cards {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .card {
+      flex: 1;
+      height: 160px;
+      border: 1px solid #000;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 16px;
+      text-decoration: none;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>ADMIN DASHBOARD</h1>
+      <a href="login.html" class="logout">Logout</a>
+    </div>
+
+    <div class="cards">
+      <a href="manage-users.html" class="card">Manage User</a>
+      <a href="monitor-events.html" class="card">Monitor Event</a>
+      <a href="approve-reject-events.html" class="card">Approve / Reject Event</a>
+      <a href="feedback.html" class="card">Feedback System</a>
+    </div>
+  </div>
+</body>
+</html>

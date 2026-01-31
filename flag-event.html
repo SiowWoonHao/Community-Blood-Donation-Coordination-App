@@ -1,0 +1,46 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flag Event</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#fff; }
+    .container { width: 420px; margin: 80px auto; }
+    h1 { font-size:26px; margin-bottom:30px; }
+    .back { display:inline-block; margin-bottom:20px; text-decoration:none; color:#000; }
+    .box { border:1px solid #000; padding:20px; margin-bottom:20px; }
+    label { display:block; margin-top:15px; }
+    select, input { width:100%; padding:10px; margin-top:5px; }
+    .actions { text-align:center; margin-top:30px; }
+    button { padding:10px 20px; margin:0 10px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <a href="monitor-events.html" class="back">← Back to Monitor Events</a>
+  <h1>Flag Event</h1>
+
+  <div class="box">
+    <strong>Event Name</strong><br>
+    Tuesday, April 30, 2025, 12:00 PM<br>
+    MMU Cyberjaya Dewan Tun Canselor
+  </div>
+
+  <label>Flag Issue</label>
+  <select>
+    <option>Inappropriate content</option>
+    <option>Incorrect information</option>
+    <option>Policy violation</option>
+  </select>
+
+  <label>Details</label>
+  <input type="text" placeholder="Enter specific details (optional)">
+
+  <div class="actions">
+    <button onclick="location.href='monitor-events.html'">Save</button>
+    <button onclick="location.href='monitor-events.html'">Close</button>
+  </div>
+</div>
+
+</body>
+</html>

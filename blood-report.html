@@ -1,0 +1,39 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Blood Inventory Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fff; }
+    .container { width: 600px; margin: 60px auto; }
+    h1 { font-size: 26px; margin-bottom: 20px; }
+    label { display: block; margin-top: 25px; font-size: 14px; }
+    select, input { width: 250px; padding: 10px; margin-top: 5px; }
+    .date-row { margin-top: 10px; }
+    .actions { text-align: right; margin-top: 40px; }
+    button { padding: 10px 20px; font-size: 14px; }
+    .back { display: inline-block; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="hospital-profile.html" class="back">← Back to Hospital Profile</a>
+    <h1>BLOOD INVENTORY REPORT</h1>
+
+    <label>Report Type:</label>
+    <select>
+      <option>Daily</option>
+      <option>Weekly</option>
+      <option>Monthly</option>
+    </select>
+
+    <label>Date Range:</label>
+    <div class="date-row">From:<br><input type="date"></div>
+    <div class="date-row">To:<br><input type="date"></div>
+
+    <div class="actions">
+      <button>Generate Report</button>
+    </div>
+  </div>
+</body>
+</html>
+
