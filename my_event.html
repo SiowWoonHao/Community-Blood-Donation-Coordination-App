@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Event - Blood Donation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background-color: #fff;
+            border-bottom: 2px solid #e0e0e0;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid #333;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .btn-primary {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #555;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .search-bar {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-bar select,
+        .search-bar input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .search-bar select {
+            min-width: 120px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding-left: 35px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .table-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+        }
+
+        .table-header {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table th {
+            background-color: #f8f8f8;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        table td {
+            font-size: 14px;
+        }
+
+        table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-top: 20px;
+            padding: 15px 0;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .pagination button,
+        .pagination span {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .pagination button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .pagination .active {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .page-info {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .entries-selector {
+            float: right;
+            margin-top: -50px;
+        }
+
+        .entries-selector select {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .status-published {
+            color: #27ae60;
+            font-weight: 500;
+        }
+
+        .status-cancelled {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            color: #f39c12;
+            font-weight: 500;
+        }
+
+        .action-links a {
+            color: #333;
+            text-decoration: none;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .action-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MY EVENT</h1>
+        <div class="header-buttons">
+            <button class="btn">Notification</button>
+            <button class="btn">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-bar">
+            <select>
+                <option>Status ▼</option>
+                <option>Published</option>
+                <option>Pending</option>
+                <option>Cancelled</option>
+            </select>
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Search......">
+            </div>
+            <button class="btn btn-primary" onclick="window.location.href='create_event.html'">+ Create New Event</button>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">Showing all event</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event Title</th>
+                        <th>Date</th>
+                        <th>Venue</th>
+                        <th>Status</th>
+                        <th>Capacity</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Blood Donation Drive 2026</td>
+                        <td>12-01-2026</td>
+                        <td>MMU</td>
+                        <td class="status-published">Published</td>
+                        <td>72/100</td>
+                        <td class="action-links">
+                            <a href="edit_event.html">Edit</a> / 
+                            <a href="view_registrations.html">View Reg</a> / 
+                            <a href="manage_event_status.html">Manage</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Emergency Blood Donation</td>
+                        <td>13-01-2026</td>
+                        <td>Hospital</td>
+                        <td class="status-cancelled">Cancelled</td>
+                        <td>10/30</td>
+                        <td class="action-links">
+                            <a href="edit_event.html">Edit</a> / 
+                            <a href="view_registrations.html">View Reg</a> / 
+                            <a href="manage_event_status.html">Manage</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hospital Blood Donation Day</td>
+                        <td>20-01-2026</td>
+                        <td>Hospital</td>
+                        <td class="status-pending">Pending</td>
+                        <td>0/150</td>
+                        <td class="action-links">
+                            <a href="edit_event.html">Edit</a> / 
+                            <a href="view_registrations.html">View Reg</a> / 
+                            <a href="manage_event_status.html">Manage</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <button>‹</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <span>...</span>
+                <button>5</button>
+                <button>›</button>
+            </div>
+
+            <div class="page-info">
+                showing 1 to 3 of event
+            </div>
+
+            <div class="entries-selector">
+                <select>
+                    <option>5 / page ▼</option>
+                    <option>10 / page</option>
+                    <option>25 / page</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

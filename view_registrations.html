@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Event Registrations - Blood Donation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .form-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            background-color: #f0f0f0;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .event-info {
+            background-color: #f8f8f8;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 3px solid #333;
+        }
+
+        .event-info h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .event-info p {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .export-btn {
+            float: right;
+            padding: 10px 20px;
+            border: 1px solid #333;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .export-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .search-bar {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-bar select,
+        .search-bar input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .search-bar select {
+            min-width: 120px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding-left: 35px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .table-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-top: none;
+            padding: 20px;
+        }
+
+        .table-header {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table th {
+            background-color: #f8f8f8;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        table td {
+            font-size: 14px;
+        }
+
+        table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-top: 20px;
+            padding: 15px 0;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .pagination button,
+        .pagination span {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .pagination button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .pagination .active {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .page-info {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .entries-selector {
+            float: right;
+            margin-top: -50px;
+        }
+
+        .entries-selector select {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .status-confirmed {
+            color: #27ae60;
+            font-weight: 500;
+        }
+
+        .status-cancelled {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .status-published {
+            color: #27ae60;
+            font-weight: 500;
+        }
+
+        .stats-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <a href="my_event.html" class="back-link">← Back to My Events</a>
+        
+        <h2>VIEW EVENT REGISTRATIONS</h2>
+
+        <div class="event-info">
+            <h3>Event: Blood Donation Drive 2026</h3>
+            <p>Date: 12-01-2026 | Time: 10:00 AM | Venue: MMU Cyberjaya Dewan Tun Canselor</p>
+            <p>Status: <span class="status-published">Published</span> | Capacity: 72/100 registered</p>
+            <button class="export-btn" onclick="alert('Exporting to CSV...')">Export to CSV</button>
+        </div>
+
+        <div class="search-bar">
+            <select>
+                <option>Sort by ▼</option>
+                <option>Time (Asc)</option>
+                <option>Name (A-Z)</option>
+                <option>Blood Type</option>
+            </select>
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Search......">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">Showing all donor</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Donor Name</th>
+                        <th>Age</th>
+                        <th>Contact</th>
+                        <th>Time Slot</th>
+                        <th>Blood Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Low Yu En</td>
+                        <td>28</td>
+                        <td>012-3456780</td>
+                        <td>10:00 - 10:20</td>
+                        <td>A+</td>
+                        <td class="status-confirmed">Confirmed</td>
+                    </tr>
+                    <tr>
+                        <td>Mohamad Syafiq bin Izam</td>
+                        <td>45</td>
+                        <td>012-3456781</td>
+                        <td>10:20 - 10:40</td>
+                        <td>O+</td>
+                        <td class="status-confirmed">Confirmed</td>
+                    </tr>
+                    <tr>
+                        <td>James Tan Jing Hong</td>
+                        <td>20</td>
+                        <td>012-3456782</td>
+                        <td>10:40 - 11:00</td>
+                        <td>AB-</td>
+                        <td class="status-confirmed">Confirmed</td>
+                    </tr>
+                    <tr>
+                        <td>How Sam Yii</td>
+                        <td>33</td>
+                        <td>012-3456783</td>
+                        <td>11:00 - 11:20</td>
+                        <td>O-</td>
+                        <td class="status-cancelled">Cancelled</td>
+                    </tr>
+                    <tr>
+                        <td>Nurul Aliya binti Ahmad</td>
+                        <td>36</td>
+                        <td>012-3456784</td>
+                        <td>11:20 - 11:40</td>
+                        <td>O-</td>
+                        <td class="status-confirmed">Confirmed</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <button>‹</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <span>...</span>
+                <button>15</button>
+                <button>›</button>
+            </div>
+
+            <div class="page-info">
+                showing 1 to 5 of donor
+            </div>
+
+            <div class="entries-selector">
+                <select>
+                    <option>15 / page ▼</option>
+                    <option>25 / page</option>
+                    <option>50 / page</option>
+                </select>
+            </div>
+
+            <div class="stats-footer">
+                Total Registrations: 72 | Confirmed: 70 | Cancelled: 2
+            </div>
+        </div>
+    </div>
+</body>
+</html>

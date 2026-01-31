@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancel Appointment - Blood Donation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .panel {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 30px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            background-color: #f0f0f0;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 25px;
+        }
+
+        .event-info {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 25px;
+            background-color: #f8f8f8;
+        }
+
+        .event-info h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .event-info p {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .confirmation-box {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .confirmation-text {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .warning-text {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 30px;
+            border: 1px solid #333;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: #fff;
+            border-color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <a href="user_profile.html" class="back-link">← Back to User Profile</a>
+            
+            <h2>CANCEL APPOINTMENT</h2>
+
+            <div class="event-info">
+                <h3>Event: Blood Donation Drive 2026</h3>
+                <p>Date: 12-01-2026</p>
+                <p>Time: 10:00 AM</p>
+                <p>Venue: MMU Cyberjaya Dewan Tun Canselor</p>
+            </div>
+
+            <div class="confirmation-box">
+                <div class="confirmation-text">
+                    Are you sure you want to cancel this appointment?
+                </div>
+                <div class="warning-text">
+                    Your appointment will be removed from your record and the time slot will be become available again.
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-danger" onclick="alert('Appointment cancelled!'); window.location.href='user_profile.html'">Yes, Cancel Appointment</button>
+                    <button class="btn" onclick="window.location.href='user_profile.html'">No, Keep Appointment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
