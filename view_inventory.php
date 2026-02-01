@@ -12,6 +12,15 @@ try {
     $stmt = $pdo->query($sql);
     $data = $stmt->fetchAll();
     
+    echo "<a href='hospital_dashboard.php' 
+    style='display:inline-block; 
+           margin-bottom:15px; 
+           text-decoration:none; 
+           border:1px solid black; 
+           padding:6px 12px; 
+           color:black;'>
+    ← Back to Hospital Dashboard
+    </a>";
     echo "<h3>Real-Time Blood Inventory</h3>";
     echo "<table border='1' cellpadding='8'>";
     echo "<tr><th>Type</th><th>Unit(s)</th><th>Status</th></tr>";
