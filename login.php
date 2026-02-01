@@ -14,41 +14,49 @@ if (isset($_POST['login'])) {
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        $row = mysqli_fetch_assoc($result);
-
-        $_SESSION['userID'] = $row['userID'];
-        $_SESSION['role']  = $row['userRole'];
-
         echo "<script>
                 alert('Login successful!');
                 window.location.href = 'donorHomePage.html';
               </script>";
     } else {
-        echo "<script>
-                alert('Invalid username or password!');
-              </script>";
+        echo "<script>alert('Invalid username or password!');</script>";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<h2>Login</h2>
+<div class="login-container">
 
-<form method="POST">
-    Username: <input type="text" name="userName" required><br><br>
-    Password: <input type="password" name="userPassword" required><br><br>
+  <h1>Community Blood Donation<br>Coordination App</h1>
 
-    <button type="submit" name="login">Login</button><br><br>
-</form>
-    <p>Haven't Register Account? <b><i><a href="register.php">Register</a></i></b></p>
+  <form method="POST">
+
+    <label>Username / email address*</label><br>
+    <input type="text" name="userName" required><br><br>
+
+    <label>Password*</label><br>
+    <input type="password" name="userPassword" required><br><br>
+
+    <button type="submit" name="login">Log In</button>
+    <button type="button" onclick="location.href='register.php'">
+      Register
+    </button>
+
+  </form>
+
+  <p>
+    Haven't Register Account?
+    <b><i><a href="register.php">Register</a></i></b>
+  </p>
+
+</div>
 
 </body>
 </html>
