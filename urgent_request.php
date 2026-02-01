@@ -48,6 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Urgent Blood Request</title>
 </head>
 <body>
+    <a href="hospital_dashboard.php"
+       style="display:inline-block; margin-bottom:15px; text-decoration:none; border:1px solid black; padding:6px 12px; color:black;">
+       ← Back to Hospital Dashboard
+    </a>
     <h2>Urgent Blood Request</h2>
     
     <?php if ($message): ?>
@@ -88,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br><br>
         
         <button type="submit" name="submit_request">Submit Urgent Request</button>
-        <button type="button" onclick="window.location.href='inventory.php'">Cancel</button>
+        <button type="button" onclick="window.location.href='hospital_dashboard.php'">Cancel</button>
     </form>
     
     <hr>
