@@ -4,12 +4,14 @@ include "db.php";
 if (isset($_POST['register'])) {
 
     $name     = $_POST['userName'];
+    $ic       = $_POST['userIC'];
     $pass     = $_POST['userPassword'];
     $confirm  = $_POST['confirmPassword'];
     $email    = $_POST['userEmail'];   // optional
     $phone    = $_POST['userPhone'];   // optional
     $role     = "Donor";               // default role
 
+    
     // 1. check password match
     if ($pass != $confirm) {
         echo "<script>alert('Password not match!');</script>";
@@ -25,9 +27,9 @@ if (isset($_POST['register'])) {
 
             // 3. insert new user
             $sql = "INSERT INTO user 
-                    (userName, userPassword, userEmail, userPhone, userRole)
+                    (userName, userIC, userPassword, userEmail, userPhone, userRole)
                     VALUES 
-                    ('$name', '$pass', '$email', '$phone', '$role')";
+                    ('$name', '$ic', '$pass', '$email', '$phone', '$role')";
 
             if (mysqli_query($conn, $sql)) {
                 echo "<script>
@@ -53,20 +55,38 @@ if (isset($_POST['register'])) {
 
 <h2>Register</h2>
 
+<p>
+    ← <a href="login.php">Back to Log In Page</a>
+</p>
+
+<h3>Your Profile Information</h3>
+
 <form method="POST">
-    Username: <input type="text" name="userName" required><br><br>
+    Full Name*:
+    <input type="text" name="userName" required><br><br>
 
-    Password: <input type="password" name="userPassword" required><br><br>
+    IC Number*:
+    <input type="text" name="userIC" required><br><br>
 
-    Confirm Password: <input type="password" name="confirmPassword" required><br><br>
+    Password:
+    <input type="password" name="userPassword" required><br><br>
 
-    Email (optional): <input type="email" name="userEmail"><br><br>
+    Confirm Password:
+    <input type="password" name="confirmPassword" required><br><br>
 
-    Phone (optional): <input type="text" name="userPhone"><br><br>
+    Email (optional):
+    <input type="email" name="userEmail"><br><br>
+
+    Phone (optional):
+    <input type="text" name="userPhone"><br><br>
 
     <button type="submit" name="register">Register</button>
 </form>
-    <p>Already Register Account? <b><i><a href="login.php">Login</a></i></b></p>
+
+<p>Already Register Account? 
+    <b><i><a href="login.php">Login</a></i></b>
+</p>
 
 </body>
 </html>
+
