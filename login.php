@@ -7,22 +7,42 @@ if (isset($_POST['login'])) {
     $name = $_POST['userName'];
     $pass = $_POST['userPassword'];
 
-    $sql = "SELECT * FROM user 
+    $sql = "SELECT userID, userName, userRole 
+            FROM user 
             WHERE userName = '$name' 
             AND userPassword = '$pass'";
 
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
-        echo "<script>
-                alert('Login successful!');
-                window.location.href = 'donorHomePage.html';
-              </script>";
+
+        $row = mysqli_fetch_assoc($result);
+
+        $_SESSION['userID']   = $row['userID'];
+        $_SESSION['userName'] = $row['userName'];
+        $_SESSION['userRole'] = $row['userRole'];
+
+        if ($row['userRole'] == "Donor") {
+            header("Location: donorHomePage.php");
+        } 
+        else if ($row['userRole'] == "Hospital") {
+            header("Location: hospitalDashboard.php");
+        } 
+        else if ($row['userRole'] == "EventOrganizer") {
+            header("Location: organizerDashboard.php");
+        } 
+        else if ($row['userRole'] == "Admin") {
+            header("Location: adminDashboard.php");
+        }
+
+        exit();
+
     } else {
         echo "<script>alert('Invalid username or password!');</script>";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

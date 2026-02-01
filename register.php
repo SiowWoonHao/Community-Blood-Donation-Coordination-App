@@ -4,7 +4,6 @@ include "db.php";
 if (isset($_POST['register'])) {
 
     $name     = $_POST['userName'];
-    $ic       = $_POST['userIC'];
     $pass     = $_POST['userPassword'];
     $confirm  = $_POST['confirmPassword'];
     $email    = $_POST['userEmail'];   // optional
@@ -27,9 +26,9 @@ if (isset($_POST['register'])) {
 
             // 3. insert new user
             $sql = "INSERT INTO user 
-                    (userName, userIC, userPassword, userEmail, userPhone, userRole)
+                    (userName, userPassword, userEmail, userPhone, userRole)
                     VALUES 
-                    ('$name', '$ic', '$pass', '$email', '$phone', '$role')";
+                    ('$name', '$pass', '$email', '$phone', '$role')";
 
             if (mysqli_query($conn, $sql)) {
                 echo "<script>
@@ -64,9 +63,6 @@ if (isset($_POST['register'])) {
 <form method="POST">
     Full Name*:
     <input type="text" name="userName" required><br><br>
-
-    IC Number*:
-    <input type="text" name="userIC" required><br><br>
 
     Password:
     <input type="password" name="userPassword" required><br><br>
