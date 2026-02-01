@@ -4,12 +4,12 @@ include "db.php";
 
 if (isset($_POST['login'])) {
 
-    $name = $_POST['userName'];
-    $pass = $_POST['userPassword'];
+    $loginInput = $_POST['loginInput'];
+    $pass       = $_POST['userPassword'];
 
-    $sql = "SELECT userID, userName, userRole 
-            FROM user 
-            WHERE userName = '$name' 
+    // Login using username or email
+    $sql = "SELECT * FROM user
+            WHERE (userName = '$loginInput' OR userEmail = '$loginInput')
             AND userPassword = '$pass'";
 
     $result = mysqli_query($conn, $sql);
@@ -18,65 +18,56 @@ if (isset($_POST['login'])) {
 
         $row = mysqli_fetch_assoc($result);
 
+        // Store session data
         $_SESSION['userID']   = $row['userID'];
         $_SESSION['userName'] = $row['userName'];
         $_SESSION['userRole'] = $row['userRole'];
 
+        // Redirect according to role
         if ($row['userRole'] == "Donor") {
-            header("Location: donorHomePage.php");
-        } 
-        else if ($row['userRole'] == "Hospital") {
-            header("Location: hospitalDashboard.php");
-        } 
-        else if ($row['userRole'] == "EventOrganizer") {
-            header("Location: organizerDashboard.php");
-        } 
-        else if ($row['userRole'] == "Admin") {
-            header("Location: adminDashboard.php");
+            $redirectPage = "donorHomePage.php";
+        } elseif ($row['userRole'] == "Hospital") {
+            $redirectPage = "hospitalDashboard.php";
+        } elseif ($row['userRole'] == "Organizer") {
+            $redirectPage = "eventOrganizerDashboard.php";
+        } elseif ($row['userRole'] == "Admin") {
+            $redirectPage = "adminDashboard.php";
+        } else {
+            // default fallback
+            $redirectPage = "login.php";
         }
 
-        exit();
+        echo "<script>
+                alert('Login successful!');
+                window.location.href = '$redirectPage';
+              </script>";
 
     } else {
-        echo "<script>alert('Invalid username or password!');</script>";
+        echo "<script>alert('Invalid login!');</script>";
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <link rel="stylesheet" href="css/style.css">
+    <title>Login</title>
 </head>
 <body>
 
-<div class="login-container">
+<h2>Login</h2>
 
-  <h1>Community Blood Donation<br>Coordination App</h1>
+<form method="POST">
+    Username or Email*:<br>
+    <input type="text" name="loginInput" required><br><br>
 
-  <form method="POST">
-
-    <label>Username / email address*</label><br>
-    <input type="text" name="userName" required><br><br>
-
-    <label>Password*</label><br>
+    Password*:<br>
     <input type="password" name="userPassword" required><br><br>
 
-    <button type="submit" name="login">Log In</button>
-    <button type="button" onclick="location.href='register.php'">
-      Register
-    </button>
+    <button type="submit" name="login">Login</button>
+</form>
 
-  </form>
-
-  <p>
-    Haven't Register Account?
-    <b><i><a href="register.php">Register</a></i></b>
-  </p>
-
-</div>
+<p><a href="register.php">Register Account</a></p>
 
 </body>
 </html>

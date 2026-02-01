@@ -3,86 +3,88 @@ include "db.php";
 
 if (isset($_POST['register'])) {
 
-    $name     = $_POST['userName'];
-    $pass     = $_POST['userPassword'];
-    $confirm  = $_POST['confirmPassword'];
-    $email    = $_POST['userEmail'];   // optional
-    $phone    = $_POST['userPhone'];   // optional
-    $role     = "Donor";               // default role
+    $name    = $_POST['userName'];
+    $email   = $_POST['userEmail'];
+    $pass    = $_POST['userPassword'];
+    $confirm = $_POST['confirmPassword'];
+    $phone   = $_POST['userPhone'];
 
-    
-    // 1. check password match
+    $role = "Donor";
+
+    // Check password match
     if ($pass != $confirm) {
-        echo "<script>alert('Password not match!');</script>";
+        echo "<script>alert('Password not match!');
+        window.location.href = 'register.php';</script>";
+        exit();
+    }
+
+    // Check gmail format
+    if (!str_ends_with($email, "@gmail.com")) {
+        echo "<script>alert('Email must be a Gmail address!');
+        window.location.href = 'register.php';</script>";
+        exit();
+    }
+
+    // Check username or email exists
+    $check = mysqli_query(
+        $conn,
+        "SELECT * FROM user 
+         WHERE userName = '$name' 
+         OR userEmail = '$email'"
+    );
+
+    if (mysqli_num_rows($check) > 0) {
+        echo "<script>alert('Username or Email already exists!')
+        window.location.href = 'register.php';;</script>";
+        exit();
+    }
+
+    // Insert user
+    $sql = "INSERT INTO user
+            (userName, userPassword, userEmail, userPhone, userRole)
+            VALUES
+            ('$name', '$pass', '$email', '$phone', '$role')";
+
+    if (mysqli_query($conn, $sql)) {
+        echo "<script>
+                alert('Register successful!');
+                window.location.href = 'login.php';
+              </script>";
     } else {
-
-        // 2. check username exist
-        $check = "SELECT * FROM user WHERE userName = '$name'";
-        $result = mysqli_query($conn, $check);
-
-        if (mysqli_num_rows($result) > 0) {
-            echo "<script>alert('Username already exists!');</script>";
-        } else {
-
-            // 3. insert new user
-            $sql = "INSERT INTO user 
-                    (userName, userPassword, userEmail, userPhone, userRole)
-                    VALUES 
-                    ('$name', '$pass', '$email', '$phone', '$role')";
-
-            if (mysqli_query($conn, $sql)) {
-                echo "<script>
-                        alert('Register successful!');
-                        window.location.href = 'login.php';
-                      </script>";
-            } else {
-                echo "<script>alert('Register failed!');</script>";
-            }
-        }
+        echo "<script>alert('Register failed!');</script>";
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Page</title>
+    <title>Register</title>
 </head>
 <body>
 
 <h2>Register</h2>
 
-<p>
-    ← <a href="login.php">Back to Log In Page</a>
-</p>
-
-<h3>Your Profile Information</h3>
-
 <form method="POST">
-    Full Name*:
+    Username*:<br>
     <input type="text" name="userName" required><br><br>
 
-    Password:
+    Gmail Address*:<br>
+    <input type="email" name="userEmail" required><br><br>
+
+    Password*:<br>
     <input type="password" name="userPassword" required><br><br>
 
-    Confirm Password:
+    Confirm Password*:<br>
     <input type="password" name="confirmPassword" required><br><br>
 
-    Email (optional):
-    <input type="email" name="userEmail"><br><br>
-
-    Phone (optional):
+    Phone:<br>
     <input type="text" name="userPhone"><br><br>
 
     <button type="submit" name="register">Register</button>
 </form>
 
-<p>Already Register Account? 
-    <b><i><a href="login.php">Login</a></i></b>
-</p>
+<p><a href="login.php">Back to Login</a></p>
 
 </body>
 </html>
-
