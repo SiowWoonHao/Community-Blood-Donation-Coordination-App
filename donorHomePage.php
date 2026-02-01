@@ -1,16 +1,17 @@
 <?php
 session_start();
+include "db.php";
 
-if (!isset($_SESSION['userID'])) {
+// login verify
+if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Donor') {
     header("Location: login.php");
     exit();
 }
 
-if ($_SESSION['userRole'] != "Donor") {
-    header("Location: login.php");
-    exit();
-}
+// Include the notification processing
+$notifications = include "processNotifications.php";
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -43,7 +44,12 @@ if ($_SESSION['userRole'] != "Donor") {
 <body>
 
 <div class="container">
-
+    <?php
+        // Show popup alerts if there are new notifications
+        foreach ($notifications as $msg) {
+            echo "<script>alert('$msg');</script>";
+        }
+    ?>
     <h2>Welcome, <?php echo $_SESSION['userName']; ?> ❤️</h2>
     <p>Role: <?php echo $_SESSION['userRole']; ?></p>
 

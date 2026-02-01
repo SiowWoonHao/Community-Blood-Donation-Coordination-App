@@ -101,8 +101,9 @@ $result = mysqli_query($conn, $sql);
             <td><?= ucfirst($row['status']); ?></td>
             <td><?= $row['description']; ?></td>
             <td>
-                <a href="editEvent.php?eventID=<?= $row['eventID']; ?>">Edit</a> |
-                <a href="manageEvent.php?eventID=<?= $row['eventID']; ?>">Manage</a>
+                <a href="editEvent.php?eventID=<?php echo $row['eventID']; ?>"><button>Edit</button></a>
+                <a href="manageEvent.php?eventID=<?php echo $row['eventID']; ?>"><button>Manage</button></a>
+                <a href="organizerViewEvents.php?eventID=<?php echo $row['eventID']; ?>"><button>View</button></a>
             </td>
         </tr>
     <?php endwhile; ?>
