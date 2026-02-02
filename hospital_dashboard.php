@@ -113,7 +113,9 @@ body {
     </div>
 
 </div>
-
+<button class="logout" onclick="location.href='logout.php'">
+    Logout
+</button>
 </body>
 </html>
 

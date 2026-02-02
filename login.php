@@ -7,6 +7,7 @@ if (isset($_POST['login'])) {
     $loginInput = $_POST['loginInput'];
     $pass       = $_POST['userPassword'];
 
+    // Login using username or email
     $sql = "SELECT * FROM user
             WHERE (userName = '$loginInput' OR userEmail = '$loginInput')
             AND userPassword = '$pass'";
@@ -17,10 +18,21 @@ if (isset($_POST['login'])) {
 
         $row = mysqli_fetch_assoc($result);
 
+        // Check user status
+        if ($row['userStatus'] !== 'Activate') {
+            echo "<script>
+                    alert('Your account is inactive. Please contact administrator.');
+                    window.location.href = 'login.php';
+                  </script>";
+            exit();
+        }
+
+        // Store session data
         $_SESSION['userID']   = $row['userID'];
         $_SESSION['userName'] = $row['userName'];
         $_SESSION['userRole'] = $row['userRole'];
 
+        // Redirect according to role
         if ($row['userRole'] == "Donor") {
             $redirectPage = "donorHomePage.php";
         } elseif ($row['userRole'] == "Hospital") {
@@ -28,8 +40,9 @@ if (isset($_POST['login'])) {
         } elseif ($row['userRole'] == "Organizer") {
             $redirectPage = "eventOrganizerDashboard.php";
         } elseif ($row['userRole'] == "Admin") {
-            $redirectPage = "admin_dashboard.php";
+            $redirectPage = "adminDashboard.php";
         } else {
+            // default fallback
             $redirectPage = "login.php";
         }
 

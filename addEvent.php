@@ -20,15 +20,17 @@ if (isset($_POST['addEvent'])) {
     $description    = $_POST['description'];
 
     $availableSlots = $maxSlots;
-    $status = "Published";
+    $status = "Pending";
+    $flagStatus = "Unflag";
 
+    // Insert into event table
     $sql = "INSERT INTO event 
         (userID, eventName, eventDate, eventVenue, availableSlots, maxSlots, 
-         eventStartTime, eventEndTime, description, status)
+         eventStartTime, eventEndTime, description, status, flagStatus)
         VALUES 
         ('$userID', '$eventName', '$eventDate', '$eventVenue', 
          '$availableSlots', '$maxSlots',
-         '$eventStartTime', '$eventEndTime', '$description', '$status')";
+         '$eventStartTime', '$eventEndTime', '$description', '$status', '$flagStatus')";
 
     if (mysqli_query($conn, $sql)) {
         echo "<script>

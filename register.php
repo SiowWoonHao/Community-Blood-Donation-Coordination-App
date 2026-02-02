@@ -10,6 +10,7 @@ if (isset($_POST['register'])) {
     $phone   = $_POST['userPhone'];
 
     $role = "Donor";
+    $userStatus = "Activate";
 
     // Check password match
     if ($pass != $confirm) {
@@ -19,7 +20,7 @@ if (isset($_POST['register'])) {
     }
 
     // Check gmail format
-    if (!str_ends_with($email, '@gmail.com')) {
+    if (!str_ends_with($email, "@gmail.com")) {
         echo "<script>alert('Email must be a Gmail address!');
         window.location.href = 'register.php';</script>";
         exit();
@@ -34,16 +35,16 @@ if (isset($_POST['register'])) {
     );
 
     if (mysqli_num_rows($check) > 0) {
-        echo "<script>alert('Username or Email already exists!');
-        window.location.href = 'register.php';</script>";
+        echo "<script>alert('Username or Email already exists!')
+        window.location.href = 'register.php';;</script>";
         exit();
     }
 
     // Insert user
     $sql = "INSERT INTO user
-            (userName, userPassword, userEmail, userPhone, userRole)
-            VALUES
-            ('$name', '$pass', '$email', '$phone', '$role')";
+        (userName, userPassword, userEmail, userPhone, userRole, userStatus)
+        VALUES
+        ('$name', '$pass', '$email', '$phone', '$role', '$userStatus')";
 
     if (mysqli_query($conn, $sql)) {
         echo "<script>

@@ -126,15 +126,15 @@ body {
     <!-- CARDS -->
     <div class="card-grid">
 
-        <div class="card" onclick="window.location.href='manage_users.php'">
+        <div class="card" onclick="window.location.href='manageUsers.php'">
             Manage User
         </div>
 
-        <div class="card" onclick="window.location.href='monitor_events.php'">
+        <div class="card" onclick="window.location.href='monitorEvents.php'">
             Monitor Event
         </div>
 
-        <div class="card" onclick="window.location.href='approve_events.php'">
+        <div class="card" onclick="window.location.href='approveEvents.php'">
             Approve / Reject Event
         </div>
 
