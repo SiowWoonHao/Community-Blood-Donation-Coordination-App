@@ -28,7 +28,7 @@ if (isset($_POST['login'])) {
         } elseif ($row['userRole'] == "Organizer") {
             $redirectPage = "eventOrganizerDashboard.php";
         } elseif ($row['userRole'] == "Admin") {
-            $redirectPage = "adminDashboard.php";
+            $redirectPage = "admin_dashboard.php";
         } else {
             $redirectPage = "login.php";
         }
