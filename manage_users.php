@@ -89,110 +89,177 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['activate_user'])) {
 <html>
 <head>
     <title>Manage Users</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 14px;
+            padding: 30px 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            margin: 0 0 15px 0;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .toolbar select,
+        .toolbar input {
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .toolbar input {
+            flex: 1;
+        }
+
+        .toolbar button {
+            padding: 10px 16px;
+            cursor: pointer;
+        }
+
+        .new-user-btn {
+            margin-left: auto;
+            background: #667eea;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+
+        /* Actions 按钮 */
+        td button {
+            padding: 6px 10px;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .footer-info {
+            margin-top: 15px;
+        }
+    </style>
 </head>
+
 <body>
+
+<div class="page-container">
+
     <h1>Manage Users</h1>
-    
-    <div style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 5px;">
-        <form method="GET">
-            <label>Search:</label>
-            <input type="text" name="search" value="<?php echo htmlspecialchars($searchTerm); ?>" placeholder="Name or Email">
-            
-            <label>Role:</label>
+
+    <a href="admin_dashboard.php" class="back-link">
+        ← Back to Admin Dashboard
+    </a>
+
+    <div class="toolbar">
+        <form method="GET" style="display:flex; gap:15px; width:100%;">
             <select name="role">
-                <option value="all" <?php echo $selectedRole === 'all' ? 'selected' : ''; ?>>All Roles</option>
-                <option value="donor" <?php echo $selectedRole === 'donor' ? 'selected' : ''; ?>>Donor</option>
-                <option value="hospital" <?php echo $selectedRole === 'hospital' ? 'selected' : ''; ?>>Hospital</option>
-                <option value="organizer" <?php echo $selectedRole === 'organizer' ? 'selected' : ''; ?>>Event Organizer</option>
-                <option value="admin" <?php echo $selectedRole === 'admin' ? 'selected' : ''; ?>>Admin</option>
+                <option value="all">All Roles</option>
+                <option value="donor">Donor</option>
+                <option value="hospital">Hospital</option>
+                <option value="organizer">Event Organizer</option>
+                <option value="admin">Admin</option>
             </select>
-            
+
+            <input type="text" name="search"
+                   value="<?php echo htmlspecialchars($searchTerm); ?>"
+                   placeholder="Search users......">
+
             <button type="submit">Search</button>
-            <button type="button" onclick="window.location.href='manage_users.php'">Reset</button>
+
+            <button type="button"
+                    class="new-user-btn"
+                    onclick="window.location.href='add_user.php'">
+                + New user
+            </button>
         </form>
     </div>
-    
-    <table border="1" cellpadding="8">
+
+    <table>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
+                <th>Username/Email</th>
                 <th>Role</th>
-                <th>Blood Type</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <?php if (empty($users)): ?>
+        <?php if (empty($users)): ?>
+            <tr>
+                <td colspan="6" style="text-align:center;">No users found</td>
+            </tr>
+        <?php else: ?>
+            <?php foreach ($users as $user): ?>
                 <tr>
-                    <td colspan="8" style="text-align: center;">No users found. Insert sample data first.</td>
+                    <td><?php echo $user['userID']; ?></td>
+                    <td><?php echo htmlspecialchars($user['userName']); ?></td>
+                    <td><?php echo htmlspecialchars($user['userEmail']); ?></td>
+                    <td><?php echo $user['userRole']; ?></td>
+                    <td><?php echo $user['eligibilityStatus']; ?></td>
+                    <td>
+                        <button onclick="window.location.href='edit_user.php?id=<?php echo $user['userID']; ?>'">
+                            Edit
+                        </button>
+                        <button onclick="window.location.href='deactivate_user.php?id=<?php echo $user['userID']; ?>'">
+                            Deactivate
+                        </button>
+                    </td>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($users as $user): ?>
-                    <tr>
-                        <td><?php echo $user['userID']; ?></td>
-                        <td><?php echo htmlspecialchars($user['userName']); ?></td>
-                        <td><?php echo htmlspecialchars($user['userEmail']); ?></td>
-                        <td><?php echo $user['userPhone']; ?></td>
-                        <td>
-                            <?php 
-                            $roleColors = [
-                                'admin' => 'red',
-                                'hospital' => 'blue',
-                                'organizer' => 'orange',
-                                'donor' => 'green'
-                            ];
-                            $color = $roleColors[$user['userRole']] ?? 'gray';
-                            ?>
-                            <span style="color: <?php echo $color; ?>; font-weight: bold;">
-                                <?php echo ucfirst($user['userRole']); ?>
-                            </span>
-                        </td>
-                        <td><?php echo $user['donorBloodType']; ?></td>
-                        <td style="color: <?php 
-                            $status = strtolower($user['eligibilityStatus']);
-                            if ($status === 'eligible' || $status === 'active') {
-                                echo 'green';
-                            } elseif ($status === 'pending') {
-                                echo 'orange';
-                            } else {
-                                echo 'red';
-                            }
-                        ?>; font-weight: bold;">
-                            <?php echo ucfirst($user['eligibilityStatus']); ?>
-                        </td>
-                        <td>
-                            <!-- Edit Button -->
-                            <button onclick="window.location.href='edit_user.php?id=<?php echo $user['userID']; ?>'">Edit</button>
-                            <!-- Deactivate/Activate Button -->
-                            <?php if (strtolower($user['eligibilityStatus']) !== 'inactive'): ?>
-                                <button onclick="window.location.href='deactivate_user.php?id=<?php echo $user['userID']; ?>'" style="color: red;">Deactivate</button>
-                            <?php else: ?>
-                                <form method="POST" style="display: inline;">
-                                    <input type="hidden" name="userID" value="<?php echo $user['userID']; ?>">
-                                    <button type="submit" name="activate_user" onclick="return confirm('Activate user <?php echo htmlspecialchars($user['userName']); ?>?')" style="color: green;">Activate</button>
-                                </form>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
         </tbody>
     </table>
-    
-    <br>
-    <p>Total Users: <?php echo count($users); ?></p>
-    
-    <script>
-        function editUser(userID) {
-            // For now, just show an alert
-            // In real implementation, redirect to edit_user.php
-            alert('Edit user ID: ' + userID);
-            // window.location.href = 'edit_user.php?id=' + userID;
-        }
-    </script>
+
+    <div class="footer-info">
+        Total Users: <?php echo count($users); ?>
+    </div>
+
+</div>
+
 </body>
 </html>
