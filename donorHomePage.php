@@ -50,7 +50,7 @@ $notifications = include "processNotifications.php";
             echo "<script>alert('$msg');</script>";
         }
     ?>
-    <h2>Welcome, <?php echo $_SESSION['userName']; ?> ❤️</h2>
+    <h2>Welcome, <?php echo $_SESSION['userName']; ?></h2>
     <p>Role: <?php echo $_SESSION['userRole']; ?></p>
 
     <hr>

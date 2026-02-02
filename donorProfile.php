@@ -107,13 +107,24 @@ $resultHistory = mysqli_query($conn, $sqlHistory);
                     <td><?php echo $row['eventVenue']; ?></td>
                     <td><?php echo substr($row['appointmentTime'],0,5); ?></td>
                     <td>
-                        <?php if($row['eventDate'] >= date('Y-m-d')) { ?>
-                            <a href="cancelAppointment.php?appointmentID=<?php echo $row['appointmentID']; ?>">
-                                <button>Cancel Booking</button>
-                            </a>
-                        <?php } else { ?>
-                            N/A
-                        <?php } ?>
+                    <?php
+                    $eventEndDateTime = strtotime($row['eventDate'] . ' ' . $row['eventEndTime']);
+                    $currentDateTime = time();
+
+                    if ($eventEndDateTime < $currentDateTime) {
+                        // Past event → feedback
+                    ?>
+                        <a href="donorFeedback.php?appointmentID=<?php echo $row['appointmentID']; ?>">
+                            <button>Give Feedback</button>
+                        </a>
+                    <?php
+                    } else {
+                        // Future event → cancel
+                    ?>
+                        <a href="cancelAppointment.php?appointmentID=<?php echo $row['appointmentID']; ?>">
+                            <button>Cancel Booking</button>
+                        </a>
+                    <?php } ?>
                     </td>
                 </tr>
             <?php } ?>

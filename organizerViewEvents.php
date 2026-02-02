@@ -2,54 +2,59 @@
 session_start();
 include "db.php";
 
-// Safety check
+// Login & role check
 if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Organizer') {
     header("Location: login.php");
     exit();
 }
 
-$userID = $_SESSION['userID'];
-
 if (!isset($_GET['eventID'])) {
-    echo "Invalid event.";
+    header("Location: eventOrganizerDashboard.php");
     exit();
 }
 
 $eventID = $_GET['eventID'];
+$organizerID = $_SESSION['userID'];
 
-// Get event info
-$sqlEvent = "SELECT * FROM event WHERE eventID = '$eventID' AND userID = '$userID'";
+// Get event info (ensure ownership)
+$sqlEvent = "SELECT * FROM event 
+             WHERE eventID='$eventID' AND userID='$organizerID'";
 $resultEvent = mysqli_query($conn, $sqlEvent);
+$event = mysqli_fetch_assoc($resultEvent);
 
-if (mysqli_num_rows($resultEvent) != 1) {
-    echo "Event not found.";
+if (!$event) {
+    header("Location: eventOrganizerDashboard.php");
     exit();
 }
 
-$event = mysqli_fetch_assoc($resultEvent);
+// Search & filter
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+$bloodType = isset($_GET['bloodType']) ? $_GET['bloodType'] : '';
 
-// Handle search & blood type filter
-$searchName = isset($_GET['searchName']) ? mysqli_real_escape_string($conn, $_GET['searchName']) : '';
-$filterBlood = isset($_GET['filterBlood']) ? mysqli_real_escape_string($conn, $_GET['filterBlood']) : '';
-
-// Get all donors for this event with search/filter
-$sqlDonors = "SELECT u.userName, u.donorAge, u.userPhone, u.donorBloodType, a.appointmentTime
+// Get donor list
+$sqlDonors = "SELECT u.userName, u.userPhone, u.donorAge, u.donorBloodType,
+                     a.appointmentTime, a.rating, a.comment
               FROM appointment a
               JOIN user u ON a.userID = u.userID
               WHERE a.eventID = '$eventID'";
 
-if ($searchName != '') {
-    $sqlDonors .= " AND u.userName LIKE '%$searchName%'";
+if ($search != '') {
+    $sqlDonors .= " AND u.userName LIKE '%$search%'";
 }
-if ($filterBlood != '' && $filterBlood != 'all') {
-    $sqlDonors .= " AND u.donorBloodType = '$filterBlood'";
+if ($bloodType != '') {
+    $sqlDonors .= " AND u.donorBloodType = '$bloodType'";
 }
-
-$sqlDonors .= " ORDER BY a.appointmentTime ASC";
 
 $resultDonors = mysqli_query($conn, $sqlDonors);
-?>
 
+// Calculate average rating (ignore 0)
+$sqlAvg = "SELECT AVG(rating) AS avgRating 
+           FROM appointment 
+           WHERE eventID='$eventID' AND rating > 0";
+$resultAvg = mysqli_query($conn, $sqlAvg);
+$rowAvg = mysqli_fetch_assoc($resultAvg);
+$averageRating = $rowAvg['avgRating'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,65 +64,102 @@ $resultDonors = mysqli_query($conn, $sqlDonors);
 <body>
 
 <h2>Event Details</h2>
+<p><a href="eventOrganizerDashboard.php">← Back to Dashboard</a></p>
 
 <p><b>Event Name:</b> <?php echo $event['eventName']; ?></p>
 <p><b>Date:</b> <?php echo $event['eventDate']; ?></p>
-<p><b>Time:</b> <?php echo substr($event['eventStartTime'],0,5) . " - " . substr($event['eventEndTime'],0,5); ?></p>
+<p><b>Time:</b>
+<?php echo substr($event['eventStartTime'],0,5) . " - " . substr($event['eventEndTime'],0,5); ?>
+</p>
 <p><b>Venue:</b> <?php echo $event['eventVenue']; ?></p>
-<p><b>Max Slots:</b> <?php echo $event['maxSlots']; ?></p>
-<p><b>Available Slots:</b> <?php echo $event['availableSlots']; ?></p>
 <p><b>Description:</b> <?php echo $event['description']; ?></p>
+<p><b>Slots:</b> <?php echo $event['availableSlots']." / ".$event['maxSlots']; ?></p>
+<p><b>Status:</b> <?php echo ucfirst($event['status']); ?></p>
+
+<p>
+<b>Average Rating:</b>
+<?php
+if ($averageRating === null) {
+    echo "No rating yet";
+} else {
+    echo number_format($averageRating, 1) . " / 5";
+}
+?>
+</p>
 
 <hr>
 
 <h3>Donor List</h3>
 
-<!-- Search Form -->
-<form method="GET" action="">
+<form method="GET">
     <input type="hidden" name="eventID" value="<?php echo $eventID; ?>">
-    Search Name: <input type="text" name="searchName" value="<?php echo htmlspecialchars($searchName); ?>">
-    Blood Type: 
-    <select name="filterBlood">
-        <option value="all">All</option>
-        <option value="A+" <?php if($filterBlood=='A+') echo 'selected';?>>A+</option>
-        <option value="A-" <?php if($filterBlood=='A-') echo 'selected';?>>A-</option>
-        <option value="B+" <?php if($filterBlood=='B+') echo 'selected';?>>B+</option>
-        <option value="B-" <?php if($filterBlood=='B-') echo 'selected';?>>B-</option>
-        <option value="O+" <?php if($filterBlood=='O+') echo 'selected';?>>O+</option>
-        <option value="O-" <?php if($filterBlood=='O-') echo 'selected';?>>O-</option>
-        <option value="AB+" <?php if($filterBlood=='AB+') echo 'selected';?>>AB+</option>
-        <option value="AB-" <?php if($filterBlood=='AB-') echo 'selected';?>>AB-</option>
-    </select>
-    <button type="submit">Search</button>
-</form>
 
-<?php if(mysqli_num_rows($resultDonors) > 0) { ?>
-    <table border="1" cellpadding="5" cellspacing="0">
-        <tr>
-            <th>Donor Name</th>
-            <th>Age</th>
-            <th>Phone</th>
-            <th>Blood Type</th>
-            <th>Appointment Time</th>
-        </tr>
-        <?php while($row = mysqli_fetch_assoc($resultDonors)) { ?>
-            <tr>
-                <td><?php echo $row['userName']; ?></td>
-                <td><?php echo $row['donorAge']; ?></td>
-                <td><?php echo $row['userPhone']; ?></td>
-                <td><?php echo $row['donorBloodType']; ?></td>
-                <td><?php echo substr($row['appointmentTime'],0,5); ?></td>
-            </tr>
-        <?php } ?>
-    </table>
-<?php } else { ?>
-    <p>No donors found for this search/filter.</p>
-<?php } ?>
+    Search Name:
+    <input type="text" name="search" value="<?php echo $search; ?>">
+
+    Blood Type:
+    <select name="bloodType">
+        <option value="">All</option>
+        <?php
+        $types = ['A+','A-','B+','B-','O+','O-','AB+','AB-'];
+        foreach ($types as $type) {
+            $selected = ($bloodType == $type) ? "selected" : "";
+            echo "<option value='$type' $selected>$type</option>";
+        }
+        ?>
+    </select>
+
+    <button type="submit">Filter</button>
+</form>
 
 <br>
-<form action="eventOrganizerDashboard.php">
-    <button type="submit">Back to Dashboard</button>
-</form>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Phone</th>
+        <th>Blood Type</th>
+        <th>Appointment Time</th>
+        <th>Rating</th>
+        <th>Comment</th>
+    </tr>
+
+<?php if (mysqli_num_rows($resultDonors) > 0) { ?>
+    <?php while ($row = mysqli_fetch_assoc($resultDonors)) { ?>
+        <tr>
+            <td><?php echo $row['userName']; ?></td>
+            <td><?php echo $row['donorAge']; ?></td>
+            <td><?php echo $row['userPhone']; ?></td>
+            <td><?php echo $row['donorBloodType']; ?></td>
+            <td><?php echo substr($row['appointmentTime'],0,5); ?></td>
+            <td>
+                <?php
+                if ($row['rating'] > 0) {
+                    echo $row['rating']." / 5";
+                } else {
+                    echo "Not rated";
+                }
+                ?>
+            </td>
+            <td>
+                <?php
+                if (!empty($row['comment'])) {
+                    echo $row['comment'];
+                } else {
+                    echo "-";
+                }
+                ?>
+            </td>
+        </tr>
+    <?php } ?>
+<?php } else { ?>
+    <tr>
+        <td colspan="7" style="text-align:center;">No donors found.</td>
+    </tr>
+<?php } ?>
+
+</table>
 
 </body>
 </html>

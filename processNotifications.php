@@ -31,10 +31,13 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         if (mysqli_num_rows($resCheck) == 0) {
             // Insert notification
-            $message = "Reminder: Your event '".$row['eventName']."' is tomorrow!";
-            $insert = "INSERT INTO notification (userID, eventID, notificationDate, message) 
-                       VALUES ('$userID', '".$row['eventID']."', '$today', '$message')";
+            $message = "Reminder: Your event ".$row['eventName']." is tomorrow!";
+            $message = mysqli_real_escape_string($conn, $message);
+
+            $insert = "INSERT INTO notification (userID, eventID, notificationDate, message)
+                    VALUES ('$userID', '".$row['eventID']."', '$today', '$message')";
             mysqli_query($conn, $insert);
+
 
             // Store message for popup
             $notificationsToShow[] = $message;
