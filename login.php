@@ -45,157 +45,145 @@ if (isset($_POST['login'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login | Community Blood Donation</title>
+<meta charset="UTF-8">
+<title>Login | Blood Donation</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-        }
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #c62828, #b71c1c);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+/* 🌈 SAME ANIMATED GRADIENT BACKGROUND */
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-        .login-page {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
+    background: linear-gradient(
+        120deg,
+        #f5f7fa,
+        #b8f7d4,
+        #9be7ff,
+        #c7d2fe,
+        #fef9c3
+    );
+    background-size: 300% 300%;
+    animation: gradientMove 18s ease infinite;
+}
 
-        .login-card {
-            background: #fff;
-            width: 420px;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-            animation: fadeIn 0.6s ease;
-        }
+@keyframes gradientMove {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            line-height: 1.3;
-        }
+/* LOGIN CARD */
+.login-card {
+    width: 420px;
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+}
 
-        label {
-            font-weight: 600;
-            font-size: 14px;
-        }
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    line-height: 1.3;
+}
 
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-top: 6px;
-            margin-bottom: 20px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-            transition: 0.3s;
-        }
+label {
+    font-size: 14px;
+    font-weight: 600;
+}
 
-        input:focus {
-            outline: none;
-            border-color: #c62828;
-            box-shadow: 0 0 0 2px rgba(198,40,40,0.15);
-        }
+input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 6px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
 
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 10px;
-        }
+input:focus {
+    outline: none;
+    border-color: #111;
+}
 
-        button {
-            padding: 12px 22px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
+/* BUTTONS */
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
 
-        .btn-login {
-            background: #c62828;
-            color: #fff;
-        }
+button {
+    padding: 12px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+}
 
-        .btn-login:hover {
-            background: #a61b1b;
-            transform: translateY(-1px);
-        }
+.btn-login {
+    background: #111;
+    color: white;
+}
 
-        .btn-register {
-            background: #f2f2f2;
-            color: #333;
-        }
+.btn-login:hover {
+    background: #333;
+}
 
-        .btn-register:hover {
-            background: #e0e0e0;
-        }
+.btn-register {
+    background: #f0f0f0;
+}
 
-        .register-link {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 14px;
-        }
-
-        .register-link a {
-            color: #c62828;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+.btn-register:hover {
+    background: #e0e0e0;
+}
+</style>
 </head>
 
 <body>
 
-<div class="login-page">
-    <div class="login-card">
+<div class="login-card">
 
-        <h1>
-            Community Blood Donation<br>
-            Coordination App
-        </h1>
+    <h1>
+        Community Blood Donation<br>
+        Coordination App
+    </h1>
 
-        <form method="POST">
+    <form method="POST">
+        <label>Username / Email *</label>
+        <input type="text" name="loginInput" required>
 
-            <label>Username / Email address *</label>
-            <input type="text" name="loginInput" required>
+        <label>Password *</label>
+        <input type="password" name="userPassword" required>
 
-            <label>Password *</label>
-            <input type="password" name="userPassword" required>
+        <div class="btn-group">
+            <button class="btn-login" type="submit" name="login">
+                Log In
+            </button>
 
-            <div class="btn-group">
-                <button type="submit" name="login" class="btn-login">Log In</button>
-                <a href="register.php">
-                    <button type="button" class="btn-register">Register</button>
-                </a>
-            </div>
+            <a href="register.php">
+                <button type="button" class="btn-register">
+                    Register
+                </button>
+            </a>
+        </div>
+    </form>
 
-        </form>
-
-    </div>
 </div>
 
 </body>
 </html>
-
