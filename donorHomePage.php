@@ -24,22 +24,39 @@ $notifications = include "processNotifications.php";
     font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
+/* 🌈 ANIMATED GRADIENT BACKGROUND */
 body {
     margin: 0;
     min-height: 100vh;
-    background: linear-gradient(135deg, #c62828, #8e0000);
     display: flex;
     justify-content: center;
     align-items: center;
+
+    background: linear-gradient(
+        120deg,
+        #f5f7fa,
+        #b8f7d4,
+        #9be7ff,
+        #c7d2fe,
+        #fef9c3
+    );
+    background-size: 300% 300%;
+    animation: gradientMove 18s ease infinite;
 }
 
-/* MAIN CONTAINER */
+@keyframes gradientMove {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 🧱 DASHBOARD CONTAINER */
 .dashboard {
     width: 900px;
     background: white;
     border-radius: 14px;
     padding: 30px 40px 40px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
 }
 
 /* HEADER */
@@ -55,7 +72,7 @@ body {
 }
 
 .header-left p {
-    margin: 6px 0 0;
+    margin-top: 6px;
     font-size: 14px;
     color: #555;
 }
@@ -66,10 +83,10 @@ body {
 }
 
 .header-right button {
-    padding: 8px 16px;
+    padding: 8px 18px;
     border-radius: 6px;
     border: none;
-    background: #c62828;
+    background: #111;
     color: white;
     cursor: pointer;
     font-size: 14px;
@@ -77,10 +94,10 @@ body {
 }
 
 .header-right button:hover {
-    background: #a61b1b;
+    background: #333;
 }
 
-/* CONTENT */
+/* CARDS */
 .cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -89,17 +106,17 @@ body {
 }
 
 .card {
-    background: white;
-    border-radius: 20px;
     height: 180px;
+    border-radius: 22px;
+    background: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.35s;
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    transition: 0.35s;
 }
 
 .card:hover {
@@ -107,7 +124,6 @@ body {
     box-shadow: 0 18px 35px rgba(0,0,0,0.25);
 }
 </style>
-
 </head>
 
 <body>
@@ -129,12 +145,8 @@ foreach ($notifications as $msg) {
         </div>
 
         <div class="header-right">
-            <button onclick="location.href='donorNotifications.php'">
-                Notification
-            </button>
-            <button onclick="location.href='logout.php'">
-                Logout
-            </button>
+            <button onclick="location.href='donorNotifications.php'">Notification</button>
+            <button onclick="location.href='logout.php'">Logout</button>
         </div>
     </div>
 
@@ -152,6 +164,11 @@ foreach ($notifications as $msg) {
             Health Eligibility
         </div>
     </div>
+
+</div>
+
+</body>
+</html>
 
 </div>
 
