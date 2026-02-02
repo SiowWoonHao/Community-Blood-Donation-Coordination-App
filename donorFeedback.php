@@ -10,7 +10,6 @@ if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Donor') {
 
 $userID = $_SESSION['userID'];
 
-// Get appointment ID
 if (!isset($_GET['appointmentID'])) {
     header("Location: donorProfile.php");
     exit();
@@ -18,7 +17,6 @@ if (!isset($_GET['appointmentID'])) {
 
 $appointmentID = $_GET['appointmentID'];
 
-// Get appointment + event info
 $sql = "SELECT a.*, e.eventName, e.eventDate, e.eventVenue, e.eventEndTime
         FROM appointment a
         JOIN event e ON a.eventID = e.eventID
@@ -26,20 +24,17 @@ $sql = "SELECT a.*, e.eventName, e.eventDate, e.eventVenue, e.eventEndTime
 $result = mysqli_query($conn, $sql);
 $data = mysqli_fetch_assoc($result);
 
-// Invalid appointment
 if (!$data) {
     header("Location: donorProfile.php");
     exit();
 }
 
-// Check event already ended
 $eventEndDateTime = strtotime($data['eventDate'] . ' ' . $data['eventEndTime']);
 if ($eventEndDateTime > time()) {
     header("Location: donorProfile.php");
     exit();
 }
 
-// Prevent duplicate feedback
 if ($data['rating'] > 0) {
     echo "<script>
             alert('You have already submitted feedback.');
@@ -48,7 +43,6 @@ if ($data['rating'] > 0) {
     exit();
 }
 
-// Handle submit
 if (isset($_POST['submit'])) {
     $rating = $_POST['rating'];
     $comment = mysqli_real_escape_string($conn, $_POST['comment']);
@@ -64,43 +58,159 @@ if (isset($_POST['submit'])) {
           </script>";
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Donor Feedback</title>
+<meta charset="UTF-8">
+<title>Share Your Feedback</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* 🌈 SAME ANIMATED GRADIENT */
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(
+        120deg,
+        #f5f7fa,
+        #b8f7d4,
+        #9be7ff,
+        #c7d2fe,
+        #fef9c3
+    );
+    background-size: 300% 300%;
+    animation: gradientMove 18s ease infinite;
+    padding: 40px;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* MAIN CARD */
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    padding: 30px 35px;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.back {
+    border: 1px solid #000;
+    padding: 12px;
+    width: 100%;
+}
+
+.back a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 600;
+}
+
+/* FEEDBACK BOX */
+.feedback-box {
+    border: 1px solid #000;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.feedback-box h3 {
+    margin-top: 0;
+}
+
+/* FORM */
+textarea {
+    width: 100%;
+    height: 120px;
+    padding: 10px;
+    resize: none;
+}
+
+select {
+    padding: 6px;
+    margin-top: 5px;
+}
+
+/* BUTTONS */
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 22px;
+    border: 1px solid #000;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:hover {
+    background: #f0f0f0;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Give Feedback</h2>
-<p><a href="donorProfile.php">← Back to Profile</a></p>
+<div class="container">
 
-<h3>Event Information</h3>
-<p><b>Event:</b> <?php echo $data['eventName']; ?></p>
-<p><b>Date:</b> <?php echo $data['eventDate']; ?></p>
-<p><b>Venue:</b> <?php echo $data['eventVenue']; ?></p>
+    <div class="header">
+        <h2>SHARE YOUR FEEDBACK</h2>
 
-<hr>
+        <div class="back">
+            ← <a href="donorProfile.php">Back to Dashboard</a>
+        </div>
+    </div>
 
-<form method="POST">
+    <div class="feedback-box">
+        <h3>How was your donation experience?</h3>
 
-    <label>Rating (1 - 5)</label><br>
-    <select name="rating" required>
-        <option value="">-- Select --</option>
-        <option value="1">1 - Very Bad</option>
-        <option value="2">2 - Bad</option>
-        <option value="3">3 - Average</option>
-        <option value="4">4 - Good</option>
-        <option value="5">5 - Excellent</option>
-    </select>
-    <br><br>
+        <form method="POST">
 
-    <label>Comment</label><br>
-    <textarea name="comment" rows="5" cols="50" required></textarea>
-    <br><br>
+            <p><b>Rate your experience:</b></p>
+            <select name="rating" required>
+                <option value="">-- Select --</option>
+                <option value="1">★ Very Bad</option>
+                <option value="2">★★ Bad</option>
+                <option value="3">★★★ Average</option>
+                <option value="4">★★★★ Good</option>
+                <option value="5">★★★★★ Excellent</option>
+            </select>
 
-    <button type="submit" name="submit">Submit Feedback</button>
-</form>
+            <p><b>Your Comment:</b></p>
+            <textarea name="comment" placeholder="Share details of your experience..." required></textarea>
+
+            <div class="actions">
+                <a href="donorProfile.php">
+                    <button type="button">SKIP</button>
+                </a>
+
+                <button type="submit" name="submit">SUBMIT</button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
 
 </body>
 </html>
+
