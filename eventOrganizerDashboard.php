@@ -18,13 +18,13 @@ if (!empty($_GET['search'])) {
     $sql .= " AND eventName LIKE '%$search%'";
 }
 
-/* Event Status filter (published / cancelled only) */
+/* Event Status filter */
 if (!empty($_GET['eventStatus'])) {
     $eventStatus = mysqli_real_escape_string($conn, $_GET['eventStatus']);
     $sql .= " AND status = '$eventStatus'";
 }
 
-/* Time Status filter (upcoming / past) */
+/* Time Status filter */
 if (!empty($_GET['timeStatus'])) {
     if ($_GET['timeStatus'] === 'upcoming') {
         $sql .= " AND eventDate >= '$today'";
@@ -36,89 +36,188 @@ if (!empty($_GET['timeStatus'])) {
 $sql .= " ORDER BY eventDate ASC";
 $result = mysqli_query($conn, $sql);
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Event Organizer Dashboard</title>
+    <title>My Event</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+
+            background: linear-gradient(
+                -45deg,
+                #f5f7fa,
+                #b8f7d4,
+                #9be7ff,
+                #c7d2fe,
+                #fef9c3
+            );
+            background-size: 500% 500%;
+            animation: gradientMove 14s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .page-container {
+            max-width: 1300px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 16px;
+            padding: 30px 40px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        .top-actions button {
+            margin-left: 10px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .filter-bar {
+            margin: 25px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background: #f4f4f4;
+        }
+
+        .add-btn {
+            display: inline-block;
+            margin: 15px 0;
+        }
+
+        button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        button:hover {
+            background: #eee;
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>My Events</h2>
-<form action="logout.php" method="post" style="margin-bottom:15px;">
-    <button type="submit">Logout</button>
-</form>
+<div class="page-container">
 
-<!-- Filter & Search -->
-<form method="GET" style="margin-bottom:20px;">
-    <input type="text" name="search" placeholder="Search event title"
-           value="<?php echo $_GET['search'] ?? ''; ?>">
+    <div class="top-bar">
+        <h2>My Event</h2>
+        <div class="top-actions">
+            <button>Notification</button>
+            <form action="logout.php" method="post" style="display:inline;">
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
 
-    <select name="eventStatus">
-        <option value="">All Event Status</option>
-        <option value="published" <?= ($_GET['eventStatus'] ?? '') === 'published' ? 'selected' : '' ?>>Published</option>
-        <option value="cancelled" <?= ($_GET['eventStatus'] ?? '') === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
-    </select>
+    <!-- Filter & Search -->
+    <form method="GET" class="filter-bar">
+        <select name="eventStatus">
+            <option value="">Status</option>
+            <option value="published" <?= ($_GET['eventStatus'] ?? '') === 'published' ? 'selected' : '' ?>>Published</option>
+            <option value="cancelled" <?= ($_GET['eventStatus'] ?? '') === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+        </select>
 
-    <select name="timeStatus">
-        <option value="">All Time</option>
-        <option value="upcoming" <?= ($_GET['timeStatus'] ?? '') === 'upcoming' ? 'selected' : '' ?>>Upcoming</option>
-        <option value="past" <?= ($_GET['timeStatus'] ?? '') === 'past' ? 'selected' : '' ?>>Past</option>
-    </select>
+        <input type="text" name="search" placeholder="Search......"
+               value="<?php echo $_GET['search'] ?? ''; ?>">
 
-    <button type="submit">Filter</button>
-    <a href="eventOrganizerDashboard.php">Reset</a>
-</form>
+        <select name="timeStatus">
+            <option value="">All Time</option>
+            <option value="upcoming" <?= ($_GET['timeStatus'] ?? '') === 'upcoming' ? 'selected' : '' ?>>Upcoming</option>
+            <option value="past" <?= ($_GET['timeStatus'] ?? '') === 'past' ? 'selected' : '' ?>>Past</option>
+        </select>
 
-<a href="addEvent.php">+ Add Event</a>
+        <button type="submit">Filter</button>
 
-<br><br>
+        <a href="addEvent.php" class="add-btn">
+            <button type="button">+ Create New Event</button>
+        </a>
+    </form>
 
-<table border="1" width="100%" cellpadding="8">
-    <tr>
-        <th>Title</th>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Venue</th>
-        <th>Slots</th>
-        <th>Status</th>
-        <th>Description</th>
-        <th>Actions</th>
-    </tr>
+    <p>Showing all event</p>
 
-<?php if (mysqli_num_rows($result) > 0): ?>
-
-    <?php while ($row = mysqli_fetch_assoc($result)): ?>
+    <table>
         <tr>
-            <td><?= $row['eventName']; ?></td>
-            <td><?= $row['eventDate']; ?></td>
-            <td>
-                <?= substr($row['eventStartTime'], 0, 5); ?>
-                -
-                <?= substr($row['eventEndTime'], 0, 5); ?>
-            </td>
-            <td><?= $row['eventVenue']; ?></td>
-            <td><?= $row['availableSlots']; ?>/<?= $row['maxSlots']; ?></td>
-            <td><?= ucfirst($row['status']); ?></td>
-            <td><?= $row['description']; ?></td>
-            <td>
-                <a href="editEvent.php?eventID=<?php echo $row['eventID']; ?>"><button>Edit</button></a>
-                <a href="manageEvent.php?eventID=<?php echo $row['eventID']; ?>"><button>Manage</button></a>
-                <a href="organizerViewEvents.php?eventID=<?php echo $row['eventID']; ?>"><button>View</button></a>
-            </td>
+            <th>Event Title</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Venue</th>
+            <th>Status</th>
+            <th>Capacity</th>
+            <th>Actions</th>
         </tr>
-    <?php endwhile; ?>
 
-<?php else: ?>
+        <?php if (mysqli_num_rows($result) > 0): ?>
+            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+            <tr>
+                <td><?= $row['eventName']; ?></td>
+                <td><?= $row['eventDate']; ?></td>
+                <td><?= substr($row['eventStartTime'],0,5); ?> - <?= substr($row['eventEndTime'],0,5); ?></td>
+                <td><?= $row['eventVenue']; ?></td>
+                <td><?= ucfirst($row['status']); ?></td>
+                <td><?= $row['availableSlots']; ?>/<?= $row['maxSlots']; ?></td>
+                <td>
+                    <a href="editEvent.php?eventID=<?= $row['eventID']; ?>"><button>Edit</button></a>
+                    <a href="organizerViewEvents.php?eventID=<?= $row['eventID']; ?>"><button>View Reg</button></a>
+                    <a href="manageEvent.php?eventID=<?= $row['eventID']; ?>"><button>Manage</button></a>
+                </td>
+            </tr>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="7" style="text-align:center;">
+                    No event matches your search criteria.
+                </td>
+            </tr>
+        <?php endif; ?>
+    </table>
 
-    <tr>
-        <td colspan="8" style="text-align:center;">
-            No event matches your search criteria.
-        </td>
-    </tr>
-
-<?php endif; ?>
-
-</table>
+</div>
 
 </body>
 </html>
+
