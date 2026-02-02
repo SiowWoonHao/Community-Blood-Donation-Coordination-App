@@ -65,58 +65,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Deactivate Account</title>
+    <title>Deactivate User Account</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+
+            background: linear-gradient(
+                120deg,
+                #f5f7fa,
+                #b8f7d4,
+                #9be7ff,
+                #c7d2fe,
+                #fef9c3
+            );
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .page-container {
+            max-width: 900px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        .back-link {
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .warning-box {
+            border: 2px solid #ccc;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .buttons {
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 8px 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Deactivate Account</h1>
-    
-    <?php if ($message): ?>
-        <p style="color: <?php echo $success ? 'green' : 'red'; ?>; font-weight: bold; padding: 10px; background: #f0f0f0;">
-            <?php echo $message; ?>
+
+<div class="page-container">
+
+    <h2>Deactivate User Account</h2>
+
+    <!-- Back link -->
+    <a class="back-link" href="edit_user.php?id=<?= $userID ?>">
+        ← Back to Edit User Account
+    </a>
+
+    <div class="warning-box">
+
+        <p>
+            ❌ <strong>Are you sure to deactivate this user account?</strong>
         </p>
-    <?php endif; ?>
-    
-    <?php if ($user): ?>
-        <?php if ($user['eligibilityStatus'] === 'inactive'): ?>
-            <div>
-                <h2>Account Already Inactive</h2>
-                <p>User: <strong><?php echo htmlspecialchars($user['userName']); ?></strong></p>
-                <p>Email: <strong><?php echo htmlspecialchars($user['userEmail']); ?></strong></p>
-                <p>Status: <strong style="color: red;">INACTIVE</strong></p>
-                <p>This account is already deactivated.</p>
-                <br>
-                <button onclick="window.location.href='manage_users.php'" style="padding: 10px 20px; font-size: 16px;">
-                    Back to Users
-                </button>
-            </div>
-        <?php else: ?>
-            <div>
-                <h2>Confirm Deactivation</h2>
-                <p>Are you sure you want to deactivate this account?</p>
-                
-                <div>
-                    <p><strong>User Information:</strong></p>
-                    <p>Name: <?php echo htmlspecialchars($user['userName']); ?></p>
-                    <p>Email: <?php echo htmlspecialchars($user['userEmail']); ?></p>
-                    <p>Role: <?php echo ucfirst($user['userRole']); ?></p>
-                    <p>Current Status: <strong><?php echo ucfirst($user['eligibilityStatus']); ?></strong></p>
-                </div>
-                
-                <p><strong>Warning:</strong> Deactivated accounts cannot login to the system.</p>
-                
-                <form method="POST" style="margin-top: 20px;">
-                    <button type="submit" name="confirm_deactivate">
-                        Deactivate Account
-                    </button>
-                    
-                    <button type="submit" name="cancel">                       
-                         Cancel
-                    </button>
-                </form>
-            </div>
-        <?php endif; ?>
-    <?php else: ?>
-        <p>User not found.</p>
-    <?php endif; ?>
+
+        <p>
+            The user Name (<?= htmlspecialchars($user['userEmail']) ?>)
+            will be deactivated and lose access to the system.
+            You can reactivate this account at any time.
+        </p>
+
+        <form method="POST" class="buttons">
+            <button type="submit" name="confirm_deactivate">
+                Deactivate
+            </button>
+
+            <button type="button"
+                onclick="window.location.href='edit_user.php?id=<?= $userID ?>'">
+                Cancel
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
 </body>
 </html>
