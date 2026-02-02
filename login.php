@@ -24,7 +24,7 @@ if (isset($_POST['login'])) {
         if ($row['userRole'] == "Donor") {
             $redirectPage = "donorHomePage.php";
         } elseif ($row['userRole'] == "Hospital") {
-            $redirectPage = "hospitalDashboard.php";
+            $redirectPage = "hospital_dashboard.php";
         } elseif ($row['userRole'] == "Organizer") {
             $redirectPage = "eventOrganizerDashboard.php";
         } elseif ($row['userRole'] == "Admin") {
