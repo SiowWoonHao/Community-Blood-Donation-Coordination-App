@@ -6,13 +6,15 @@ if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Admin') {
     header("Location: login.php");
     exit();
 }
+
+$notifications = include "processNotifications.php";
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
 
 <style>
 * {
@@ -20,7 +22,7 @@ if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Admin') {
     font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-/* 🌈 SAME GRADIENT TEMPLATE */
+/* 🌈 SAME GRADIENT AS DONOR */
 body {
     margin: 0;
     min-height: 100vh;
@@ -43,67 +45,103 @@ body {
     100% { background-position: 0% 50%; }
 }
 
-/* MAIN CARD */
-.dashboard {
-    max-width: 700px;
+/* 🧱 MAIN WHITE CONTAINER (SAME SIZE FEEL AS DONOR) */
+.dashboard-wrapper {
+    max-width: 1200px;
     margin: auto;
     background: #fff;
-    padding: 40px 30px;
-    border-radius: 18px;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-    text-align: center;
+    border-radius: 26px;
+    padding: 40px 50px 60px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
 }
 
-/* TITLE */
-.dashboard h1 {
-    margin-top: 0;
-    margin-bottom: 40px;
+/* HEADER */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 50px;
 }
 
-.dashboard button {
-    width: 320px;
-    padding: 15px 30px;
-    font-size: 18px;
+.dashboard-header h1 {
+    margin: 0;
+    font-size: 34px;
+}
+
+/* LOGOUT */
+.logout-btn {
+    padding: 10px 22px;
     border: 1px solid #000;
     background: #fff;
     cursor: pointer;
     font-weight: 600;
 }
 
-.dashboard button:hover {
-    background: #f0f0f0;
+.logout-btn:hover {
+    background: #f2f2f2;
+}
+
+/* 🟦 CARD GRID (JUST NICE SIZE, NOT TOO BIG) */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+}
+
+/* 🧊 EACH CARD */
+.card {
+    height: 190px;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 18px 35px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 50px rgba(0,0,0,0.25);
 }
 </style>
 </head>
 
 <body>
 
-<div class="dashboard">
+<div class="dashboard-wrapper">
 
-    <h1>Admin Dashboard</h1>
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <h1>ADMIN DASHBOARD</h1>
+        <button class="logout-btn" onclick="window.location.href='logout.php'">
+            Logout
+        </button>
+    </div>
 
-    <div style="margin-bottom: 30px;">
-        <button onclick="window.location.href='manage_users.php'">
-            Manage Users
-        </button>
-    </div>
-    
-    <div style="margin-bottom: 30px;">
-        <button onclick="window.location.href='monitor_events.php'">
-            Monitor Events
-        </button>
-    </div>
-    
-    <div style="margin-bottom: 30px;">
-        <button onclick="window.location.href='approve_events.php'">
-            Approve / Reject Events
-        </button>
-    </div>
-    
-    <div style="margin-bottom: 30px;">
-        <button onclick="window.location.href='feedback.php'">
+    <!-- CARDS -->
+    <div class="card-grid">
+
+        <div class="card" onclick="window.location.href='manage_users.php'">
+            Manage User
+        </div>
+
+        <div class="card" onclick="window.location.href='monitor_events.php'">
+            Monitor Event
+        </div>
+
+        <div class="card" onclick="window.location.href='approve_events.php'">
+            Approve / Reject Event
+        </div>
+
+        <div class="card" onclick="window.location.href='feedback.php'">
             Feedback System
-        </button>
+        </div>
+
     </div>
 
 </div>
