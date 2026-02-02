@@ -1,5 +1,4 @@
 <?php
-// （你的 PHP 原样保留，不动）
 $host = 'localhost';
 $dbname = 'cbdcdatabase';
 $username = 'root';
@@ -9,7 +8,6 @@ $reportData = null;
 $message = '';
 $reportSaved = false;
 
-/* ……中间 PHP 逻辑完全照你原本的…… */
 ?>
 <!DOCTYPE html>
 <html lang="en">
