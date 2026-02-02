@@ -135,25 +135,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <a href="admin_dashboard.php" class="back-link">← Back to Admin Dashboard</a>
 
     <h1>Manage Users</h1>
-
+    
     <div class="filter-box">
-        <form method="GET">
-            <label>Search:</label>
-            <input type="text" name="search" value="<?php echo htmlspecialchars($searchTerm); ?>" placeholder="Name or Email">
+    <form method="GET" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
 
-            <label>Role:</label>
-            <select name="role">
-                <option value="all">All Roles</option>
-                <option value="donor">Donor</option>
-                <option value="hospital">Hospital</option>
-                <option value="organizer">Event Organizer</option>
-                <option value="admin">Admin</option>
-            </select>
+        <label>Search:</label>
+        <input type="text" name="search"
+               value="<?php echo htmlspecialchars($searchTerm); ?>"
+               placeholder="Name or Email">
 
-            <button type="submit">Search</button>
-            <button type="button" onclick="window.location.href='manage_users.php'">Reset</button>
-        </form>
-    </div>
+        <label>Role:</label>
+        <select name="role">
+            <option value="all">All Roles</option>
+            <option value="donor">Donor</option>
+            <option value="hospital">Hospital</option>
+            <option value="organizer">Event Organizer</option>
+            <option value="admin">Admin</option>
+        </select>
+
+        <button type="submit">Search</button>
+        <button type="button" onclick="window.location.href='manage_users.php'">Reset</button>
+
+        <button type="button"
+                onclick="window.location.href='create_user.php'"
+                style="margin-left:auto;">
+            + New user
+        </button>
+
+    </form>
+</div>
+
 
     <table>
         <thead>
