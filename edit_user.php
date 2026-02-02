@@ -6,80 +6,66 @@ $username = 'root';
 $password = '';
 
 $message = '';
-$success = false;
 $user = null;
 
-// Get user ID from URL
+// Get user ID
 $userID = $_GET['id'] ?? 0;
-
-if (empty($userID)) {
+if (!$userID) {
     die("User ID is required");
 }
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    
-    // Get user data
-    $sql = "SELECT * FROM user WHERE userID = ?";
-    $stmt = $pdo->prepare($sql);
+
+    // Fetch user
+    $stmt = $pdo->prepare("SELECT * FROM user WHERE userID = ?");
     $stmt->execute([$userID]);
     $user = $stmt->fetch();
-    
+
     if (!$user) {
         die("User not found");
     }
-    
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
 }
 
-// Handle form submission
+// Update user
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
-    $fullName = $_POST['fullName'] ?? '';
-    $userEmail = $_POST['userEmail'] ?? '';
-    $userPhone = $_POST['userPhone'] ?? '';
-    $userRole = $_POST['userRole'] ?? '';
-    $donorBloodType = $_POST['donorBloodType'] ?? '';
-    $eligibilityStatus = $_POST['eligibilityStatus'] ?? '';
-    
-    // Validate inputs
-    if (empty($fullName) || empty($userEmail) || empty($userRole)) {
-        $message = "Please fill in required fields";
-    } elseif (!filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-        $message = "Please enter a valid email address";
-    } else {
-        try {
-            // Check if email already exists (excluding current user)
-            $checkSql = "SELECT COUNT(*) FROM user WHERE userEmail = ? AND userID != ?";
-            $checkStmt = $pdo->prepare($checkSql);
-            $checkStmt->execute([$userEmail, $userID]);
-            
-            if ($checkStmt->fetchColumn() > 0) {
-                $message = "Email already exists for another user";
-            } else {
-                // Update user
-                $updateSql = "UPDATE user SET 
-                            userName = ?, 
-                            userEmail = ?, 
-                            userPhone = ?, 
-                            userRole = ?, 
-                            donorBloodType = ?, 
-                            eligibilityStatus = ?
-                            WHERE userID = ?";
-                
-                $updateStmt = $pdo->prepare($updateSql);
-                $updateStmt->execute([
-                    $fullName, $userEmail, $userPhone, $userRole,
-                    $donorBloodType, $eligibilityStatus, $userID
-                ]);
-                
-                // Refresh user data
-                $stmt->execute([$userID]);
-                $user = $stmt->fetch();
-            }
-        } catch (PDOException $e) {
-            $message = "Error: " . $e->getMessage();
-        }
+    $fullName = $_POST['fullName'];
+    $userEmail = $_POST['userEmail'];
+    $userPhone = $_POST['userPhone'];
+    $userRole = $_POST['userRole'];
+    $donorBloodType = $_POST['donorBloodType'];
+    $eligibilityStatus = $_POST['eligibilityStatus'];
+
+    try {
+        $update = $pdo->prepare("
+            UPDATE user SET
+                userName = ?,
+                userEmail = ?,
+                userPhone = ?,
+                userRole = ?,
+                donorBloodType = ?,
+                eligibilityStatus = ?
+            WHERE userID = ?
+        ");
+        $update->execute([
+            $fullName,
+            $userEmail,
+            $userPhone,
+            $userRole,
+            $donorBloodType,
+            $eligibilityStatus,
+            $userID
+        ]);
+
+        // Refresh data
+        $stmt->execute([$userID]);
+        $user = $stmt->fetch();
+
+        $message = "User updated successfully!";
+    } catch (PDOException $e) {
+        $message = "Update failed: " . $e->getMessage();
     }
 }
 ?>
@@ -88,122 +74,137 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
 <html>
 <head>
     <title>Edit User Account</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+
+            background: linear-gradient(
+                120deg,
+                #f5f7fa,
+                #b8f7d4,
+                #9be7ff,
+                #c7d2fe,
+                #fef9c3
+            );
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .page-container {
+            max-width: 900px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        h1 { margin-top: 0; }
+
+        label { font-weight: bold; }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 6px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
+
+<div class="page-container">
+
+    <a href="manage_users.php" class="back-link">← Back to Manage Users</a>
+
     <h1>Edit User Account</h1>
-    
+
     <?php if ($message): ?>
-        <p style="color: <?php echo $success ? 'green' : 'red'; ?>; font-weight: bold;">
-            <?php echo $message; ?>
-        </p>
+        <p><strong><?= $message ?></strong></p>
     <?php endif; ?>
-    
-    <?php if ($user): ?>
-    <div style="margin: 30px 0; max-width: 500px;">
-        <form method="POST">
-            <div style="margin-bottom: 15px;">
-                <label for="fullName">Full Name:</label><br>
-                <input type="text" id="fullName" name="fullName" 
-                       value="<?php echo htmlspecialchars($user['userName']); ?>" 
-                       style="width: 300px; padding: 8px;" required>
-            </div>
-            
-            <div style="margin-bottom: 15px;">
-                <label for="userEmail">Username/Email:</label><br>
-                <input type="email" id="userEmail" name="userEmail" 
-                       value="<?php echo htmlspecialchars($user['userEmail']); ?>" 
-                       style="width: 300px; padding: 8px;" required>
-            </div>
-            
-            <div style="margin-bottom: 15px;">
-                <label for="userPhone">Phone Number:</label><br>
-                <input type="text" id="userPhone" name="userPhone" 
-                       value="<?php echo htmlspecialchars($user['userPhone']); ?>" 
-                       style="width: 300px; padding: 8px;" required>
-            </div>
-            
-            <div style="margin-bottom: 15px;">
-                <label for="userRole">Role:</label><br>
-                <select id="userRole" name="userRole" style="width: 320px; padding: 8px;" required>
-                    <option value="admin" <?php echo $user['userRole'] === 'admin' ? 'selected' : ''; ?>>Admin</option>
-                    <option value="donor" <?php echo $user['userRole'] === 'donor' ? 'selected' : ''; ?>>Donor</option>
-                    <option value="hospital" <?php echo $user['userRole'] === 'hospital' ? 'selected' : ''; ?>>Hospital</option>
-                    <option value="organizer" <?php echo $user['userRole'] === 'organizer' ? 'selected' : ''; ?>>Event Organizer</option>
-                </select>
-            </div>
-            
-            <div style="margin-bottom: 15px;">
-                <label for="donorBloodType">Blood Type:</label><br>
-                <select id="donorBloodType" name="donorBloodType" style="width: 320px; padding: 8px;">
-                    <option value="N/A" <?php echo $user['donorBloodType'] === 'N/A' ? 'selected' : ''; ?>>Not Applicable</option>
-                    <option value="O+" <?php echo $user['donorBloodType'] === 'O+' ? 'selected' : ''; ?>>O+</option>
-                    <option value="A+" <?php echo $user['donorBloodType'] === 'A+' ? 'selected' : ''; ?>>A+</option>
-                    <option value="B+" <?php echo $user['donorBloodType'] === 'B+' ? 'selected' : ''; ?>>B+</option>
-                    <option value="AB+" <?php echo $user['donorBloodType'] === 'AB+' ? 'selected' : ''; ?>>AB+</option>
-                    <option value="O-" <?php echo $user['donorBloodType'] === 'O-' ? 'selected' : ''; ?>>O-</option>
-                    <option value="A-" <?php echo $user['donorBloodType'] === 'A-' ? 'selected' : ''; ?>>A-</option>
-                    <option value="B-" <?php echo $user['donorBloodType'] === 'B-' ? 'selected' : ''; ?>>B-</option>
-                    <option value="AB-" <?php echo $user['donorBloodType'] === 'AB-' ? 'selected' : ''; ?>>AB-</option>
-                </select>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-                <label for="eligibilityStatus">Status:</label><br>
-                <select id="eligibilityStatus" name="eligibilityStatus" style="width: 320px; padding: 8px;" required>
-                    <option value="active" <?php echo $user['eligibilityStatus'] === 'active' ? 'selected' : ''; ?>>Active</option>
-                    <option value="eligible" <?php echo $user['eligibilityStatus'] === 'eligible' ? 'selected' : ''; ?>>Eligible</option>
-                    <option value="pending" <?php echo $user['eligibilityStatus'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="inactive" <?php echo $user['eligibilityStatus'] === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
-                </select>
-            </div>
-            
-            <button type="submit" name="update_user">
-                Update Account
-            </button>
-            
-            <button type="button" onclick="window.location.href='manage_users.php'">
-                Cancel
-            </button>
-        </form>
-    </div>
-    
-    <hr>
-    
-    <h3>User Information:</h3>
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>User ID</th>
-            <td><?php echo $user['userID']; ?></td>
-        </tr>
-        <tr>
-            <th>Age</th>
-            <td><?php echo $user['donorAge']; ?></td>
-        </tr>
-        <tr>
-            <th>Gender</th>
-            <td><?php echo $user['donorGender']; ?></td>
-        </tr>
-        <tr>
-            <th>Height</th>
-            <td><?php echo $user['donorHeight']; ?> cm</td>
-        </tr>
-        <tr>
-            <th>Weight</th>
-            <td><?php echo $user['donorWeight']; ?> kg</td>
-        </tr>
-        <tr>
-            <th>Organization</th>
-            <td><?php echo htmlspecialchars($user['organizationName']); ?></td>
-        </tr>
-        <tr>
-            <th>Hospital Address</th>
-            <td><?php echo htmlspecialchars($user['hospitalAddress']); ?></td>
-        </tr>
-    </table>
-    
-    <?php else: ?>
-        <p>User not found.</p>
-    <?php endif; ?>
+
+    <form method="POST">
+
+        <div class="field">
+            <label>Full Name*</label>
+            <input type="text" name="fullName" value="<?= htmlspecialchars($user['userName']) ?>" required>
+        </div>
+
+        <div class="field">
+            <label>Username / Email*</label>
+            <input type="email" name="userEmail" value="<?= htmlspecialchars($user['userEmail']) ?>" required>
+        </div>
+
+        <div class="field">
+            <label>Phone</label>
+            <input type="text" name="userPhone" value="<?= htmlspecialchars($user['userPhone']) ?>">
+        </div>
+
+        <div class="field">
+            <label>Role</label>
+            <select name="userRole">
+                <option value="admin" <?= $user['userRole']=='admin'?'selected':'' ?>>Admin</option>
+                <option value="donor" <?= $user['userRole']=='donor'?'selected':'' ?>>Donor</option>
+                <option value="hospital" <?= $user['userRole']=='hospital'?'selected':'' ?>>Hospital</option>
+                <option value="organizer" <?= $user['userRole']=='organizer'?'selected':'' ?>>Event Organizer</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Blood Type</label>
+            <select name="donorBloodType">
+                <?php
+                $types = ['N/A','O+','O-','A+','A-','B+','B-','AB+','AB-'];
+                foreach ($types as $type) {
+                    $sel = $user['donorBloodType']==$type ? 'selected' : '';
+                    echo "<option value='$type' $sel>$type</option>";
+                }
+                ?>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Status</label>
+            <select name="eligibilityStatus">
+                <option value="active" <?= $user['eligibilityStatus']=='active'?'selected':'' ?>>Active</option>
+                <option value="eligible" <?= $user['eligibilityStatus']=='eligible'?'selected':'' ?>>Eligible</option>
+                <option value="pending" <?= $user['eligibilityStatus']=='pending'?'selected':'' ?>>Pending</option>
+                <option value="inactive" <?= $user['eligibilityStatus']=='inactive'?'selected':'' ?>>Inactive</option>
+            </select>
+        </div>
+
+        <button type="submit" name="update_user">Update</button>
+        <button type="button" onclick="window.location.href='manage_users.php'">Cancel</button>
+
+    </form>
+
+</div>
 
 </body>
 </html>
