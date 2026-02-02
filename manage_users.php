@@ -53,13 +53,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             margin: 0;
             min-height: 100vh;
             font-family: Arial, sans-serif;
-
-            background: linear-gradient(
-                -45deg,
-                #667eea,
-                #764ba2,
-                #6a11cb,
-                #2575fc
+   
+            background: linear-gradient(    
+            120deg,
+            #f5f7fa,
+            #b8f7d4,
+            #9be7ff,
+            #c7d2fe,
+            #fef9c3
             );
             background-size: 400% 400%;
             animation: gradientBG 12s ease infinite;
@@ -198,4 +199,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 </body>
 </html>
+
 
