@@ -83,9 +83,8 @@ body {
 <div class="dashboard">
 
     <h1>Hospital Dashboard</h1>
-
-      <div class="header-right">
-            <button onclick="location.href='donorNotifications.php'">Notification</button>
+   
+     <div class="header-right">
             <button onclick="location.href='logout.php'">Logout</button>
         </div>
 
