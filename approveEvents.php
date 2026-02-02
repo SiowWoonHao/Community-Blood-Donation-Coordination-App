@@ -25,7 +25,7 @@ $events = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 </head>
 <body>
     <h1>Approve Pending Events</h1>
-    <p><a href="adminDashboard.php">Back to Dashboard</a></p>
+    <p><a href="admin_dashboard.php">Back to Dashboard</a></p>
     <form method="GET">
         <input type="text" name="search" placeholder="Search by name or venue" value="<?php echo htmlspecialchars($search); ?>">
         <button type="submit">Search</button>
