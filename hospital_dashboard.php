@@ -1,3 +1,12 @@
+<?php
+session_start();
+include "db.php";
+
+if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Hospital') {
+    header("Location: login.php");
+    exit();
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
