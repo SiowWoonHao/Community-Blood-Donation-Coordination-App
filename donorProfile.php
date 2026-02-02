@@ -24,7 +24,7 @@ $sqlStats = "SELECT
              JOIN event ON appointment.eventID = event.eventID
              WHERE appointment.userID = '$userID'
              AND event.status = 'published'
-             AND event.eventDate <= CURDATE()"; // only completed
+             AND event.eventDate <= CURDATE()";
 
 $resultStats = mysqli_query($conn, $sqlStats);
 $stats = mysqli_fetch_assoc($resultStats);
@@ -45,104 +45,198 @@ $resultHistory = mysqli_query($conn, $sqlHistory);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Donor Profile</title>
+<meta charset="UTF-8">
+<title>User Profile</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* 🌈 GLOBAL ANIMATED GRADIENT */
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(
+        120deg,
+        #f5f7fa,
+        #b8f7d4,
+        #9be7ff,
+        #c7d2fe,
+        #fef9c3
+    );
+    background-size: 300% 300%;
+    animation: gradientMove 18s ease infinite;
+    padding: 40px;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* MAIN WRAPPER */
+.container {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+}
+
+/* HEADER */
+.header {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+/* BACK */
+.back {
+    margin-bottom: 25px;
+}
+.back a {
+    text-decoration: none;
+    color: #111;
+    font-weight: 600;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 25px;
+}
+
+/* CARD */
+.card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    margin-top: 0;
+    font-size: 16px;
+}
+
+/* BUTTONS */
+button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #000;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:hover {
+    background: #f0f0f0;
+}
+
+/* HISTORY */
+.history-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 18px;
+}
+
+.history-title {
+    text-align: center;
+    font-weight: 700;
+    margin: 20px 0 10px;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Donor Profile</h2>
+<div class="container">
 
-<!-- User Profile -->
-<div style="border:1px solid #000; padding:10px; margin-bottom:20px;">
-    <h3>Profile Information</h3>
-    <p><b>Name:</b> <?php echo $user['userName']; ?></p>
-    <p><b>Email:</b> <?php echo $user['userEmail']; ?></p>
-    <p><b>Phone:</b> <?php echo $user['userPhone']; ?></p>
-    <p><b>Age:</b> <?php echo $user['donorAge']; ?></p>
-    <p><b>Gender:</b> <?php echo $user['donorGender']; ?></p>
-    <p><b>Height:</b> <?php echo $user['donorHeight']; ?></p>
-    <p><b>Weight:</b> <?php echo $user['donorWeight']; ?></p>
-    <p><b>Blood Type:</b> <?php echo $user['donorBloodType']; ?></p>
-    <button onclick="location.href='editDonorProfile.php'">Edit</button>
-</div>
+    <div class="header">USER PROFILE</div>
 
-<!-- Eligibility Status -->
-<div style="border:1px solid #000; padding:10px; margin-bottom:20px;">
-    <h3>Health Eligibility</h3>
-    <p><?php echo $user['eligibilityStatus']; ?></p>
-    <button onclick="location.href='healthEligibility.php'">Edit</button>
-</div>
+    <div class="back">
+        ← <a href="donorHomePage.php">Back to Dashboard</a>
+    </div>
 
-<!-- Donation Statistics -->
-<div style="border:1px solid #000; padding:10px; margin-bottom:20px;">
-    <h3>Donation Statistics</h3>
-    <p><b>Total Donations:</b> <?php echo $stats['totalDonations'] ?? 0; ?></p>
-    <p><b>First Donation:</b> <?php echo $stats['firstDonation'] ?? 'N/A'; ?></p>
-    <p><b>Last Donation:</b> <?php echo $stats['lastDonation'] ?? 'N/A'; ?></p>
-</div>
+    <div class="grid">
 
-<!-- Donation History -->
-<div style="border:1px solid #000; padding:10px; margin-bottom:20px;">
-    <h3>Donation History</h3>
-    <table border="1" cellpadding="5" cellspacing="0">
-        <tr>
-            <th>Event Name</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Venue</th>
-            <th>Appointment Time</th>
-            <th>Action</th>
-        </tr>
-        <?php if(mysqli_num_rows($resultHistory) > 0) { ?>
-            <?php while($row = mysqli_fetch_assoc($resultHistory)) { ?>
-                <tr>
-                    <td><?php echo $row['eventName']; ?></td>
-                    <td><?php echo $row['eventDate']; ?></td>
-                    <td>
-                        <?php 
-                            echo substr($row['eventStartTime'],0,5) 
-                                . " - " . substr($row['eventEndTime'],0,5);
-                        ?>
-                    </td>
-                    <td><?php echo $row['eventVenue']; ?></td>
-                    <td><?php echo substr($row['appointmentTime'],0,5); ?></td>
-                    <td>
+        <!-- LEFT COLUMN -->
+        <div>
+
+            <div class="card">
+                <p><b><?php echo $user['userName']; ?></b></p>
+                <p>IC: <?php echo $user['donorIC'] ?? '-'; ?></p>
+                <p>Blood Type: <?php echo $user['donorBloodType']; ?></p>
+                <p>Phone Num.: <?php echo $user['userPhone']; ?></p>
+                <p>Email: <?php echo $user['userEmail']; ?></p>
+                <button onclick="location.href='editDonorProfile.php'">Edit Profile</button>
+            </div>
+
+            <div class="card">
+                <h3>Current Eligibility Status</h3>
+                <p><?php echo $user['eligibilityStatus']; ?></p>
+                <p>Last updated: <?php echo $user['eligibilityUpdatedDate'] ?? '-'; ?></p>
+                <button onclick="location.href='healthEligibility.php'">Edit</button>
+            </div>
+
+            <div class="card">
+                <h3>Donation Statistics</h3>
+                <p>Total Donations: <?php echo $stats['totalDonations'] ?? 0; ?> times</p>
+                <p>First Donation: <?php echo $stats['firstDonation'] ?? 'N/A'; ?></p>
+                <p>Last Donation: <?php echo $stats['lastDonation'] ?? 'N/A'; ?></p>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+
+            <h3 class="history-title">Donation History</h3>
+
+            <?php if(mysqli_num_rows($resultHistory) > 0) { ?>
+                <?php while($row = mysqli_fetch_assoc($resultHistory)) { ?>
+
+                <div class="history-card">
+                    <p><b>Event:</b> <?php echo $row['eventName']; ?></p>
+                    <p>Date: <?php echo $row['eventDate']; ?></p>
+                    <p>
+                        Time:
+                        <?php echo substr($row['eventStartTime'],0,5); ?>
+                        -
+                        <?php echo substr($row['eventEndTime'],0,5); ?>
+                    </p>
+                    <p>Venue: <?php echo $row['eventVenue']; ?></p>
+
                     <?php
                     $eventEndDateTime = strtotime($row['eventDate'] . ' ' . $row['eventEndTime']);
                     $currentDateTime = time();
 
                     if ($eventEndDateTime < $currentDateTime) {
-                        // Past event → feedback
                     ?>
-                        <a href="donorFeedback.php?appointmentID=<?php echo $row['appointmentID']; ?>">
-                            <button>Give Feedback</button>
-                        </a>
-                    <?php
-                    } else {
-                        // Future event → cancel
-                    ?>
-                        <a href="cancelAppointment.php?appointmentID=<?php echo $row['appointmentID']; ?>">
-                            <button>Cancel Booking</button>
-                        </a>
+                        <button onclick="location.href='donorFeedback.php?appointmentID=<?php echo $row['appointmentID']; ?>'">
+                            Feedback
+                        </button>
+                    <?php } else { ?>
+                        <button onclick="location.href='cancelAppointment.php?appointmentID=<?php echo $row['appointmentID']; ?>'">
+                            Cancel Booking
+                        </button>
                     <?php } ?>
-                    </td>
-                </tr>
+                </div>
+
+                <?php } ?>
+            <?php } else { ?>
+                <p style="text-align:center;">No donation history.</p>
             <?php } ?>
-        <?php } else { ?>
-            <tr>
-                <td colspan="6" style="text-align:center;">No donation history.</td>
-            </tr>
-        <?php } ?>
-    </table>
+
+        </div>
+
+    </div>
+
 </div>
-
-<form action="donorHomePage.php">
-    <button type="submit">Back</button>
-</form>
-
-<form action="logout.php" method="post">
-    <button type="submit">Logout</button>
-</form>
 
 </body>
 </html>
