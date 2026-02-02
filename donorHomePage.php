@@ -2,16 +2,17 @@
 session_start();
 include "db.php";
 
+// login verify
 if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Donor') {
     header("Location: login.php");
     exit();
 }
 
+// notifications
 $notifications = include "processNotifications.php";
-if (!is_array($notifications)) {
-    $notifications = [];
-}
+?>
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -23,6 +24,7 @@ if (!is_array($notifications)) {
     font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
+/* 🌈 ANIMATED GRADIENT BACKGROUND */
 body {
     margin: 0;
     min-height: 100vh;
@@ -48,6 +50,7 @@ body {
     100% { background-position: 0% 50%; }
 }
 
+/* 🧱 DASHBOARD CONTAINER */
 .dashboard {
     width: 900px;
     background: white;
@@ -56,6 +59,7 @@ body {
     box-shadow: 0 25px 50px rgba(0,0,0,0.25);
 }
 
+/* HEADER */
 .header {
     display: flex;
     justify-content: space-between;
@@ -93,7 +97,7 @@ body {
     background: #333;
 }
 
-
+/* CARDS */
 .cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -125,6 +129,7 @@ body {
 <body>
 
 <?php
+// popup notifications
 foreach ($notifications as $msg) {
     echo "<script>alert('$msg');</script>";
 }
@@ -132,6 +137,7 @@ foreach ($notifications as $msg) {
 
 <div class="dashboard">
 
+    <!-- HEADER -->
     <div class="header">
         <div class="header-left">
             <h1>DONOR DASHBOARD</h1>
@@ -144,6 +150,7 @@ foreach ($notifications as $msg) {
         </div>
     </div>
 
+    <!-- CARDS -->
     <div class="cards">
         <div class="card" onclick="location.href='donorProfile.php'">
             User Profile
@@ -157,11 +164,6 @@ foreach ($notifications as $msg) {
             Health Eligibility
         </div>
     </div>
-
-</div>
-
-</body>
-</html>
 
 </div>
 
