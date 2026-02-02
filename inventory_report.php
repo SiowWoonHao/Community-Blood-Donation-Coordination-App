@@ -1,4 +1,5 @@
 <?php
+// Blood Inventory Report Page
 $host = 'localhost';
 $dbname = 'cbdcdatabase';
 $username = 'root';
@@ -8,7 +9,148 @@ $reportData = null;
 $message = '';
 $reportSaved = false;
 
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['generate_report'])) {
+        $reportType = $_POST['reportType'] ?? 'inventory';
+        $dateFrom = $_POST['dateFrom'] ?? '';
+        $dateTo = $_POST['dateTo'] ?? '';
+        $dateRange = $_POST['dateRange'] ?? '0';
+        $userID = 1; // Assuming userID 1
+        
+        try {
+            $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+            
+            if ($reportType === 'inventory') {
+                // Current Inventory Report
+                $sql = "SELECT bloodType, SUM(quantity) as total 
+                        FROM bloodinventory 
+                        GROUP BY bloodType 
+                        ORDER BY bloodType";
+                $stmt = $pdo->query($sql);
+                $inventory = $stmt->fetchAll();
+                
+                $totalUnits = 0;
+                $lowStock = [];
+                $criticalStock = [];
+                $inventoryDetails = [];
+                
+                foreach ($inventory as $item) {
+                    $totalUnits += $item['total'];
+                    
+                    if ($item['total'] >= 300) {
+                        $status = 'Good';
+                    } elseif ($item['total'] >= 200) {
+                        $status = 'Moderate';
+                    } elseif ($item['total'] >= 100) {
+                        $status = 'Low';
+                        $lowStock[] = $item['bloodType'];
+                    } else {
+                        $status = 'Critical';
+                        $criticalStock[] = $item['bloodType'];
+                    }
+                    
+                    $inventoryDetails[] = [
+                        'bloodType' => $item['bloodType'],
+                        'quantity' => $item['total'],
+                        'status' => $status
+                    ];
+                }
+                
+                $summary = "Total Units: $totalUnits | Blood Types: " . count($inventory);
+                if (!empty($lowStock)) {
+                    $summary .= " | Low Stock: " . implode(', ', $lowStock);
+                }
+                if (!empty($criticalStock)) {
+                    $summary .= " | Critical: " . implode(', ', $criticalStock);
+                }
+                
+                $details = json_encode($inventoryDetails, JSON_PRETTY_PRINT);
+                
+                // Save to bloodinventoryreport table
+                $insertSql = "INSERT INTO bloodinventoryreport 
+                              (userID, bloodType, dateRange, generatedDate, summary, details) 
+                              VALUES (?, ?, ?, ?, ?, ?)";
+                
+                $insertStmt = $pdo->prepare($insertSql);
+                // For inventory report, bloodType is 'ALL' and dateRange is 0
+                $insertStmt->execute([$userID, 'ALL', 0, date('Y-m-d'), $summary, $details]);
+                
+                $reportData = [
+                    'type' => 'Current Inventory Report',
+                    'period' => 'As of ' . date('Y-m-d H:i:s'),
+                    'inventory' => $inventory,
+                    'summary' => [
+                        'total_units' => $totalUnits,
+                        'blood_types' => count($inventory),
+                        'low_stock' => $lowStock,
+                        'critical_stock' => $criticalStock
+                    ]
+                ];
+                $reportSaved = true;
+                
+            } elseif ($reportType === 'blood_type' && !empty($_POST['bloodType'])) {
+                // Specific Blood Type Report
+                $bloodType = $_POST['bloodType'];
+                $dateRange = (int)$_POST['dateRange'];
+                
+                // Calculate date based on dateRange
+                $startDate = date('Y-m-d', strtotime("-$dateRange days"));
+                $endDate = date('Y-m-d');
+                
+                // Get inventory for specific blood type
+                $invSql = "SELECT SUM(quantity) as total FROM bloodinventory 
+                           WHERE bloodType = ? AND lastUpdated >= ?";
+                $invStmt = $pdo->prepare($invSql);
+                $invStmt->execute([$bloodType, $startDate]);
+                $inventoryResult = $invStmt->fetch();
+                
+                // Get requests for specific blood type
+                $reqSql = "SELECT COUNT(*) as request_count, SUM(quantity) as total_requests 
+                           FROM bloodrequest 
+                           WHERE bloodType = ? AND requestDate BETWEEN ? AND ?";
+                $reqStmt = $pdo->prepare($reqSql);
+                $reqStmt->execute([$bloodType, $startDate, $endDate]);
+                $requestsResult = $reqStmt->fetch();
+                
+                $summary = "Blood Type: $bloodType | Period: $dateRange days | ";
+                $summary .= "Current Stock: " . ($inventoryResult['total'] ?? 0) . " units | ";
+                $summary .= "Requests: " . ($requestsResult['request_count'] ?? 0) . " | ";
+                $summary .= "Units Requested: " . ($requestsResult['total_requests'] ?? 0);
+                
+                $details = json_encode([
+                    'inventory' => $inventoryResult,
+                    'requests' => $requestsResult,
+                    'period' => "$dateRange days ($startDate to $endDate)"
+                ], JSON_PRETTY_PRINT);
+                
+                // Save to bloodinventoryreport table
+                $insertSql = "INSERT INTO bloodinventoryreport 
+                              (userID, bloodType, dateRange, generatedDate, summary, details) 
+                              VALUES (?, ?, ?, ?, ?, ?)";
+                
+                $insertStmt = $pdo->prepare($insertSql);
+                $insertStmt->execute([$userID, $bloodType, $dateRange, date('Y-m-d'), $summary, $details]);
+                
+                $reportData = [
+                    'type' => "Blood Type Report: $bloodType",
+                    'period' => "Last $dateRange days ($startDate to $endDate)",
+                    'inventory' => $inventoryResult,
+                    'requests' => $requestsResult
+                ];
+                $reportSaved = true;
+                
+            } else {
+                $message = "Please select blood type and date range";
+            }
+            
+        } catch (PDOException $e) {
+            $message = "Error: " . $e->getMessage();
+        }
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -216,3 +358,4 @@ window.onload = toggleReportFields;
 
 </body>
 </html>
+
