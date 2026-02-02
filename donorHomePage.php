@@ -8,74 +8,150 @@ if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Donor') {
     exit();
 }
 
-// Include the notification processing
+// notifications
 $notifications = include "processNotifications.php";
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Donor Home Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            width: 500px;
-            margin: auto;
-            text-align: center;
-        }
-        button {
-            width: 250px;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .logout {
-            background-color: #f44336;
-            color: white;
-            border: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Donor Dashboard</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #c62828, #8e0000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* MAIN CONTAINER */
+.dashboard {
+    width: 900px;
+    background: white;
+    border-radius: 14px;
+    padding: 30px 40px 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left h1 {
+    margin: 0;
+    font-size: 26px;
+}
+
+.header-left p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.header-right {
+    display: flex;
+    gap: 12px;
+}
+
+.header-right button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    background: #c62828;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.header-right button:hover {
+    background: #a61b1b;
+}
+
+/* CONTENT */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.card {
+    background: white;
+    border-radius: 20px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.35s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 35px rgba(0,0,0,0.25);
+}
+</style>
+
 </head>
+
 <body>
 
-<div class="container">
-    <?php
-        // Show popup alerts if there are new notifications
-        foreach ($notifications as $msg) {
-            echo "<script>alert('$msg');</script>";
-        }
-    ?>
-    <h2>Welcome, <?php echo $_SESSION['userName']; ?></h2>
-    <p>Role: <?php echo $_SESSION['userRole']; ?></p>
+<?php
+// popup notifications
+foreach ($notifications as $msg) {
+    echo "<script>alert('$msg');</script>";
+}
+?>
 
-    <hr>
+<div class="dashboard">
 
-    <button onclick="location.href='donorNotifications.php'">
-        🔔 Notifications
-    </button>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h1>DONOR DASHBOARD</h1>
+            <p><?php echo $_SESSION['userName']; ?></p>
+        </div>
 
-    <button onclick="location.href='donorProfile.php'">
-        👤 User Profile
-    </button>
+        <div class="header-right">
+            <button onclick="location.href='donorNotifications.php'">
+                Notification
+            </button>
+            <button onclick="location.href='logout.php'">
+                Logout
+            </button>
+        </div>
+    </div>
 
-    <button onclick="location.href='viewEvents.php'">
-        📅 Available Events
-    </button>
+    <!-- CARDS -->
+    <div class="cards">
+        <div class="card" onclick="location.href='donorProfile.php'">
+            User Profile
+        </div>
 
-    <button onclick="location.href='healthEligibility.php'">
-        🩺 Health Eligibility
-    </button>
+        <div class="card" onclick="location.href='viewEvents.php'">
+            Available Events
+        </div>
 
-    <hr>
-
-    <button class="logout" onclick="location.href='logout.php'">
-        Logout
-    </button>
+        <div class="card" onclick="location.href='healthEligibility.php'">
+            Health Eligibility
+        </div>
+    </div>
 
 </div>
 
