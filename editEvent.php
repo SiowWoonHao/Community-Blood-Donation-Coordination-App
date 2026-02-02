@@ -38,10 +38,8 @@ if (isset($_POST['updateEvent'])) {
     $eventEndTime   = $_POST['eventEndTime'];
     $description    = $_POST['description'];
 
-    // Always reset availableSlots to maxSlots
     $availableSlots = $maxSlots;
 
-    // Update event in database
     $sqlUpdate = "UPDATE event SET
                     eventName = '$eventName',
                     eventDate = '$eventDate',
@@ -67,52 +65,164 @@ if (isset($_POST['updateEvent'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Event</title>
-    <script>
-    // Ensure end time >= start time
-    function checkTime() {
-        const start = document.getElementById('eventStartTime').value;
-        const end = document.getElementById('eventEndTime').value;
-        if (end && start && end < start) {
-            alert("End time cannot be earlier than start time!");
-            document.getElementById('eventEndTime').value = "";
-        }
+<title>Edit Event</title>
+
+<style>
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(
+        -45deg,
+        #f5f7fa,
+        #b8f7d4,
+        #9be7ff,
+        #c7d2fe,
+        #fef9c3
+    );
+    background-size: 500% 500%;
+    animation: gradientMove 14s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.page {
+    max-width: 900px;
+    margin: 50px auto;
+    background: #fff;
+    border-radius: 14px;
+    padding: 35px 45px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+}
+
+.back {
+    margin-bottom: 20px;
+}
+
+.back a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #000;
+}
+
+textarea {
+    resize: none;
+}
+
+.buttons {
+    margin-top: 25px;
+}
+
+button {
+    padding: 8px 18px;
+    border: 1px solid #000;
+    background: white;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+button:hover {
+    background: #eee;
+}
+
+.note {
+    margin-top: 10px;
+    font-size: 13px;
+}
+</style>
+
+<script>
+function checkTime() {
+    const start = document.getElementById('eventStartTime').value;
+    const end = document.getElementById('eventEndTime').value;
+    if (end && start && end < start) {
+        alert("End time cannot be earlier than start time!");
+        document.getElementById('eventEndTime').value = "";
     }
-    </script>
+}
+</script>
 </head>
+
 <body>
 
-<h2>Edit Event</h2>
+<div class="page">
 
-<form method="POST">
-    Event Name*:<br>
-    <input type="text" name="eventName" required value="<?php echo $row['eventName']; ?>"><br><br>
+    <h2>Edit Event</h2>
 
-    Event Date*:<br>
-    <input type="date" name="eventDate" required min="<?php echo date('Y-m-d'); ?>" 
-           value="<?php echo $row['eventDate']; ?>"><br><br>
+    <div class="back">
+        ← <a href="eventOrganizerDashboard.php">Back to My Events</a>
+    </div>
 
-    Event Venue*:<br>
-    <input type="text" name="eventVenue" required value="<?php echo $row['eventVenue']; ?>"><br><br>
+    <p><strong>Edit Event:</strong> <?php echo $row['eventName']; ?></p>
 
-    Max Slots*:<br>
-    <input type="number" name="maxSlots" min="1" required value="<?php echo $row['maxSlots']; ?>"><br><br>
+    <form method="POST">
 
-    Event Start Time*:<br>
-    <input type="time" id="eventStartTime" name="eventStartTime" required onchange="checkTime()" 
-           value="<?php echo $row['eventStartTime']; ?>"><br><br>
+        <div class="form-group">
+            Event Title*  
+            <input type="text" name="eventName" required value="<?php echo $row['eventName']; ?>">
+        </div>
 
-    Event End Time*:<br>
-    <input type="time" id="eventEndTime" name="eventEndTime" required onchange="checkTime()" 
-           value="<?php echo $row['eventEndTime']; ?>"><br><br>
+        <div class="form-group">
+            Event Date*  
+            <input type="date" name="eventDate" required min="<?php echo date('Y-m-d'); ?>"
+                   value="<?php echo $row['eventDate']; ?>">
+        </div>
 
-    Description:<br>
-    <textarea name="description" rows="4" cols="50"><?php echo $row['description']; ?></textarea><br><br>
+        <div class="form-group">
+            Venue / Location*  
+            <input type="text" name="eventVenue" required value="<?php echo $row['eventVenue']; ?>">
+        </div>
 
-    <button type="submit" name="updateEvent">Update Event</button>
-</form>
+        <div class="form-group">
+            Capacity (max donors)  
+            <input type="number" name="maxSlots" min="1" required value="<?php echo $row['maxSlots']; ?>">
+        </div>
 
-<p><a href="eventOrganizerDashboard.php">Back to Dashboard</a></p>
+        <div class="form-group">
+            Event Start Time*  
+            <input type="time" id="eventStartTime" name="eventStartTime" required
+                   onchange="checkTime()" value="<?php echo $row['eventStartTime']; ?>">
+        </div>
+
+        <div class="form-group">
+            Event End Time*  
+            <input type="time" id="eventEndTime" name="eventEndTime" required
+                   onchange="checkTime()" value="<?php echo $row['eventEndTime']; ?>">
+        </div>
+
+        <div class="form-group">
+            Description  
+            <textarea name="description" rows="4"><?php echo $row['description']; ?></textarea>
+        </div>
+
+        <div class="buttons">
+            <button type="submit" name="updateEvent">Save Changes</button>
+            <a href="eventOrganizerDashboard.php">
+                <button type="button">Cancel</button>
+            </a>
+        </div>
+
+        <div class="note">
+            Note: Major changes may reset status to "Pending Approval"
+        </div>
+
+    </form>
+
+</div>
 
 </body>
 </html>
