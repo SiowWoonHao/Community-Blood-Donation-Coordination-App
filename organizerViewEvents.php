@@ -47,59 +47,127 @@ if ($bloodType != '') {
 
 $resultDonors = mysqli_query($conn, $sqlDonors);
 
-// Calculate average rating (ignore 0)
-$sqlAvg = "SELECT AVG(rating) AS avgRating 
-           FROM appointment 
-           WHERE eventID='$eventID' AND rating > 0";
-$resultAvg = mysqli_query($conn, $sqlAvg);
-$rowAvg = mysqli_fetch_assoc($resultAvg);
-$averageRating = $rowAvg['avgRating'];
+// Calculate stats
+$total = mysqli_num_rows($resultDonors);
+$confirmed = 0;
+$cancelled = 0;
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>View Event</title>
+<title>View Event Registrations</title>
+
+<style>
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial, sans-serif;
+    background: linear-gradient(
+        -45deg,
+        #f5f7fa,
+        #b8f7d4,
+        #9be7ff,
+        #c7d2fe,
+        #fef9c3
+    );
+    background-size:500% 500%;
+    animation: gradientMove 14s ease infinite;
+}
+@keyframes gradientMove{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+.page{
+    max-width:1100px;
+    margin:40px auto;
+    background:#fff;
+    padding:35px 45px;
+    border-radius:14px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.18);
+}
+
+.back{
+    margin-bottom:20px;
+}
+.back a{
+    text-decoration:none;
+    font-weight:bold;
+    color:black;
+}
+
+.event-box{
+    border:1px solid #000;
+    padding:15px;
+    margin-bottom:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.filters{
+    display:flex;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+input, select{
+    padding:6px;
+    border:1px solid #000;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+th, td{
+    border:1px solid #000;
+    padding:8px;
+    text-align:left;
+}
+
+.footer{
+    margin-top:15px;
+    font-size:14px;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Event Details</h2>
-<p><a href="eventOrganizerDashboard.php">← Back to Dashboard</a></p>
+<div class="page">
 
-<p><b>Event Name:</b> <?php echo $event['eventName']; ?></p>
-<p><b>Date:</b> <?php echo $event['eventDate']; ?></p>
-<p><b>Time:</b>
-<?php echo substr($event['eventStartTime'],0,5) . " - " . substr($event['eventEndTime'],0,5); ?>
-</p>
-<p><b>Venue:</b> <?php echo $event['eventVenue']; ?></p>
-<p><b>Description:</b> <?php echo $event['description']; ?></p>
-<p><b>Slots:</b> <?php echo $event['availableSlots']." / ".$event['maxSlots']; ?></p>
-<p><b>Status:</b> <?php echo ucfirst($event['status']); ?></p>
+<h2>VIEW EVENT REGISTRATIONS</h2>
 
-<p>
-<b>Average Rating:</b>
-<?php
-if ($averageRating === null) {
-    echo "No rating yet";
-} else {
-    echo number_format($averageRating, 1) . " / 5";
-}
-?>
-</p>
+<div class="back">
+    ← <a href="eventOrganizerDashboard.php">Back to My Events</a>
+</div>
 
-<hr>
+<div class="event-box">
+    <div>
+        <b>Event:</b> <?php echo $event['eventName']; ?><br>
+        <b>Date:</b> <?php echo $event['eventDate']; ?> |
+        <b>Time:</b> <?php echo substr($event['eventStartTime'],0,5)." - ".substr($event['eventEndTime'],0,5); ?> |
+        <b>Venue:</b> <?php echo $event['eventVenue']; ?><br>
+        <b>Status:</b> <?php echo ucfirst($event['status']); ?> |
+        <b>Capacity:</b> <?php echo ($event['maxSlots'] - $event['availableSlots'])."/".$event['maxSlots']; ?> registered
+    </div>
 
-<h3>Donor List</h3>
+    <button>Export to CSV</button>
+</div>
 
-<form method="GET">
+<form method="GET" class="filters">
     <input type="hidden" name="eventID" value="<?php echo $eventID; ?>">
+    <select>
+        <option>Sort by</option>
+    </select>
 
-    Search Name:
-    <input type="text" name="search" value="<?php echo $search; ?>">
+    <input type="text" name="search" placeholder="Search..." value="<?php echo $search; ?>">
 
-    Blood Type:
     <select name="bloodType">
-        <option value="">All</option>
+        <option value="">All Blood Types</option>
         <?php
         $types = ['A+','A-','B+','B-','O+','O-','AB+','AB-'];
         foreach ($types as $type) {
@@ -112,54 +180,47 @@ if ($averageRating === null) {
     <button type="submit">Filter</button>
 </form>
 
-<br>
+<table>
+<tr>
+    <th>Donor Name</th>
+    <th>Age</th>
+    <th>Contact</th>
+    <th>Time Slot</th>
+    <th>Blood Type</th>
+    <th>Status</th>
+</tr>
 
-<table border="1" cellpadding="5" cellspacing="0">
-    <tr>
-        <th>Name</th>
-        <th>Age</th>
-        <th>Phone</th>
-        <th>Blood Type</th>
-        <th>Appointment Time</th>
-        <th>Rating</th>
-        <th>Comment</th>
-    </tr>
+<?php
+mysqli_data_seek($resultDonors, 0);
+if ($total > 0) {
+while ($row = mysqli_fetch_assoc($resultDonors)) {
 
-<?php if (mysqli_num_rows($resultDonors) > 0) { ?>
-    <?php while ($row = mysqli_fetch_assoc($resultDonors)) { ?>
-        <tr>
-            <td><?php echo $row['userName']; ?></td>
-            <td><?php echo $row['donorAge']; ?></td>
-            <td><?php echo $row['userPhone']; ?></td>
-            <td><?php echo $row['donorBloodType']; ?></td>
-            <td><?php echo substr($row['appointmentTime'],0,5); ?></td>
-            <td>
-                <?php
-                if ($row['rating'] > 0) {
-                    echo $row['rating']." / 5";
-                } else {
-                    echo "Not rated";
-                }
-                ?>
-            </td>
-            <td>
-                <?php
-                if (!empty($row['comment'])) {
-                    echo $row['comment'];
-                } else {
-                    echo "-";
-                }
-                ?>
-            </td>
-        </tr>
-    <?php } ?>
-<?php } else { ?>
-    <tr>
-        <td colspan="7" style="text-align:center;">No donors found.</td>
-    </tr>
+    $status = ($row['rating'] === null) ? "Confirmed" : "Confirmed";
+    $confirmed++;
+?>
+<tr>
+    <td><?php echo $row['userName']; ?></td>
+    <td><?php echo $row['donorAge']; ?></td>
+    <td><?php echo $row['userPhone']; ?></td>
+    <td><?php echo substr($row['appointmentTime'],0,5); ?></td>
+    <td><?php echo $row['donorBloodType']; ?></td>
+    <td><?php echo $status; ?></td>
+</tr>
+<?php }} else { ?>
+<tr>
+    <td colspan="6" style="text-align:center;">No donors found.</td>
+</tr>
 <?php } ?>
-
 </table>
+
+<div class="footer">
+    <b>Total Registrations:</b> <?php echo $total; ?> |
+    <b>Confirmed:</b> <?php echo $confirmed; ?> |
+    <b>Cancelled:</b> <?php echo $cancelled; ?>
+</div>
+
+</div>
 
 </body>
 </html>
+
