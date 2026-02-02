@@ -2,12 +2,10 @@
 session_start();
 include "db.php";
 
-if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Hospital') {
+if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Admin') {
     header("Location: login.php");
     exit();
 }
-
-$notifications = include "processNotifications.php";
 ?>
 
 <!DOCTYPE html>
@@ -62,7 +60,6 @@ body {
     margin-bottom: 40px;
 }
 
-/* BUTTONS (保持你原本逻辑，只统一外观) */
 .dashboard button {
     width: 320px;
     padding: 15px 30px;
