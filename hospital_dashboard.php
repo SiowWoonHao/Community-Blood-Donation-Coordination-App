@@ -83,6 +83,18 @@ body {
 <div class="dashboard">
 
     <h1>Hospital Dashboard</h1>
+    
+    <div class="header">
+        <div class="header-left">
+            <h1>DONOR DASHBOARD</h1>
+            <p><?php echo $_SESSION['userName']; ?></p>
+        </div>
+
+        <div class="header-right">
+            <button onclick="location.href='donorNotifications.php'">Notification</button>
+            <button onclick="location.href='logout.php'">Logout</button>
+        </div>
+    </div>
 
     <div>
         <button onclick="window.location.href='view_inventory.php'">
