@@ -161,7 +161,7 @@ if (isset($_POST['book'])) {
 
     <h2>BOOK APPOINTMENT</h2>
 
-    <a href="availableEvents.php">← Back to Available Event</a>
+    <a href="viewEvents.php">← Back to Available Event</a>
 
     <div class="event-box">
         <p><b>Event:</b> <?= $event['eventName'] ?></p>
