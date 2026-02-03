@@ -132,13 +132,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $insertStmt = $pdo->prepare($insertSql);
                 $insertStmt->execute([$userID, $bloodType, $dateRange, date('Y-m-d'), $summary, $details]);
                 
+                // FIXED: Create inventory array for the table display
+                $inventoryArray = [];
+                if ($inventoryResult && isset($inventoryResult['total'])) {
+                    $inventoryArray[] = [
+                        'bloodType' => $bloodType,
+                        'total' => $inventoryResult['total'] ?? 0
+                    ];
+                }
+                
                 $reportData = [
                     'type' => "Blood Type Report: $bloodType",
                     'period' => "Last $dateRange days ($startDate to $endDate)",
-                    'inventory' => $inventoryResult,
-                    'requests' => $requestsResult
+                    'inventory' => $inventoryArray, // Now it's an array
+                    'inventory_result' => $inventoryResult,
+                    'requests_result' => $requestsResult
                 ];
                 $reportSaved = true;
+                $message = "Report for $bloodType generated!";
                 
             } else {
                 $message = "Please select blood type and date range";
@@ -315,7 +326,7 @@ th, td {
         <h3><?php echo $reportData['type']; ?></h3>
         <p><b>Period:</b> <?php echo $reportData['period']; ?></p>
 
-        <?php if (isset($reportData['inventory']) && is_array($reportData['inventory'])): ?>
+        <?php if (isset($reportData['inventory']) && is_array($reportData['inventory']) && !empty($reportData['inventory'])): ?>
             <table>
                 <tr>
                     <th>Blood Type</th>
@@ -324,21 +335,37 @@ th, td {
                 </tr>
 
                 <?php foreach ($reportData['inventory'] as $item): ?>
-                    <?php
-                    if ($item['total'] >= 300) { $status='Good'; $color='green'; }
-                    elseif ($item['total'] >= 200) { $status='Moderate'; $color='blue'; }
-                    elseif ($item['total'] >= 100) { $status='Low'; $color='orange'; }
-                    else { $status='Critical'; $color='red'; }
-                    ?>
-                    <tr>
-                        <td><?php echo $item['bloodType']; ?></td>
-                        <td><?php echo $item['total']; ?></td>
-                        <td style="color:<?php echo $color; ?>;font-weight:bold;">
-                            <?php echo $status; ?>
-                        </td>
-                    </tr>
+                    <?php if (is_array($item) && isset($item['bloodType']) && isset($item['total'])): ?>
+                        <?php
+                        if ($item['total'] >= 300) { $status='Good'; $color='green'; }
+                        elseif ($item['total'] >= 200) { $status='Moderate'; $color='blue'; }
+                        elseif ($item['total'] >= 100) { $status='Low'; $color='orange'; }
+                        else { $status='Critical'; $color='red'; }
+                        ?>
+                        <tr>
+                            <td><?php echo $item['bloodType']; ?></td>
+                            <td><?php echo $item['total']; ?></td>
+                            <td style="color:<?php echo $color; ?>;font-weight:bold;">
+                                <?php echo $status; ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </table>
+        <?php elseif (isset($reportData['inventory_result'])): ?>
+            <!-- For blood type report -->
+            <h4>Summary for <?php echo htmlspecialchars($_POST['bloodType'] ?? ''); ?>:</h4>
+            <p>Current Stock: <?php echo $reportData['inventory_result']['total'] ?? 0; ?> units</p>
+            <p>Requests in period: <?php echo $reportData['requests_result']['request_count'] ?? 0; ?></p>
+            <p>Units Requested: <?php echo $reportData['requests_result']['total_requests'] ?? 0; ?></p>
+        <?php else: ?>
+            <p>No inventory data available.</p>
+        <?php endif; ?>
+
+        <?php if ($reportSaved): ?>
+            <p style="color: green; font-weight: bold; margin-top: 20px;">
+                ✓ Report has been saved to database.
+            </p>
         <?php endif; ?>
 
     <?php endif; ?>
@@ -358,4 +385,3 @@ window.onload = toggleReportFields;
 
 </body>
 </html>
-
