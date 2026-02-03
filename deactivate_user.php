@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Deactivate User Account</h2>
 
     <!-- Back link -->
-    <a class="back-link" href="edit_user.php?id=<?= $userID ?>">
+    <a class="back-link" href="editUser.php?id=<?= $userID ?>">
         ← Back to Edit User Account
     </a>
 
