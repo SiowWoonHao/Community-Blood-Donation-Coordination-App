@@ -37,11 +37,113 @@ $events = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 <html>
 <head>
     <title>Monitor Events</title>
+
+<style>
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(-45deg, #9ef0e1, #b8e7ff, #c6b8ff, #9ef0e1);
+    background-size: 400% 400%;
+    animation: gradientBG 12s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    background: white;
+    width: 90%;
+    max-width: 1300px;
+    margin: 40px auto;
+    padding: 30px 40px;
+    border-radius: 22px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.back-link {
+    color: #6a5cff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter-bar input[type="text"] {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.filter-bar label {
+    font-size: 14px;
+}
+
+.filter-bar button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    background: #6a5cff;
+    color: white;
+    cursor: pointer;
+}
+
+.filter-bar button:hover {
+    opacity: 0.85;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th {
+    background: #f2f3f7;
+    text-align: left;
+    padding: 12px;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+    background: #f9f9ff;
+}
+
+td button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #6a5cff;
+    background: white;
+    cursor: pointer;
+}
+
+td button:hover {
+    background: #6a5cff;
+    color: white;
+}
+</style>
 </head>
+
 <body>
+<div class="container">
+
     <h1>Monitor Events</h1>
-    <p><a href="adminDashboard.php">Back to Dashboard</a></p>
-    <form method="GET" style="margin-bottom: 20px;">
+    <p><a class="back-link" href="adminDashboard.php">← Back to Dashboard</a></p>
+
+    <form method="GET" class="filter-bar">
         <input type="text" name="search" placeholder="Search by name or venue" value="<?php echo htmlspecialchars($search); ?>">
         <label>
             <input type="checkbox" name="onlyFlagged" value="1" <?php echo $onlyFlagged ? 'checked' : ''; ?>>
@@ -51,7 +153,7 @@ $events = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
         <button type="button" onclick="window.location.href='monitorEvents.php'">Reset</button>
     </form>
 
-    <table border="1" cellpadding="8">
+    <table>
         <tr>
             <th>ID</th>
             <th>Name</th>
@@ -59,8 +161,8 @@ $events = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
             <th>Date</th>
             <th>Time</th>
             <th>Venue</th>
-            <th>Available Slots</th>
-            <th>Max Slots</th>
+            <th>Available</th>
+            <th>Max</th>
             <th>Status</th>
             <th>Flag</th>
             <th>Action</th>
@@ -91,5 +193,8 @@ $events = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
             <?php endforeach; ?>
         <?php endif; ?>
     </table>
+
+</div>
 </body>
 </html>
+
