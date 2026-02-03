@@ -98,7 +98,7 @@ body{
 <h2>Approve / Reject Event</h2>
 
 <div class="back-bar">
-    <a href="admin_dashboard.php">← Back to Admin Dashboard</a>
+    <a href="adminDashboard.php">← Back to Admin Dashboard</a>
 </div>
 
 <div class="event-card">
