@@ -10,37 +10,59 @@ $success = false;
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['update'])) {
+    if (isset($_POST['add']) || isset($_POST['subtract'])) {
         $bloodType = $_POST['bloodType'] ?? '';
         $quantity = $_POST['quantity'] ?? '';
         $userID = 1;
 
-        if (!empty($bloodType) && is_numeric($quantity) && $quantity >= 0) {
+        if (!empty($bloodType) && is_numeric($quantity) && $quantity > 0) {
             try {
                 $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
 
-                $checkSql = "SELECT * FROM bloodinventory WHERE bloodType = ? AND userID = ?";
+                $checkSql = "SELECT quantity FROM bloodinventory WHERE bloodType = ? AND userID = ?";
                 $checkStmt = $pdo->prepare($checkSql);
                 $checkStmt->execute([$bloodType, $userID]);
+                $currentRecord = $checkStmt->fetch();
 
-                if ($checkStmt->rowCount() > 0) {
-                    $updateSql = "UPDATE bloodinventory SET quantity = ? WHERE bloodType = ? AND userID = ?";
-                    $updateStmt = $pdo->prepare($updateSql);
-                    $updateStmt->execute([$quantity, $bloodType, $userID]);
-                    $message = "Successfully updated $bloodType to $quantity units";
+                if (isset($_POST['add'])) {
+                    // ADD operation
+                    if ($currentRecord) {
+                        $newQuantity = $currentRecord['quantity'] + $quantity;
+                        $updateSql = "UPDATE bloodinventory SET quantity = ? WHERE bloodType = ? AND userID = ?";
+                        $updateStmt = $pdo->prepare($updateSql);
+                        $updateStmt->execute([$newQuantity, $bloodType, $userID]);
+                        $message = "Successfully added $quantity units to $bloodType. New total: $newQuantity units";
+                    } else {
+                        $insertSql = "INSERT INTO bloodinventory (userID, bloodType, quantity) VALUES (?, ?, ?)";
+                        $insertStmt = $pdo->prepare($insertSql);
+                        $insertStmt->execute([$userID, $bloodType, $quantity]);
+                        $message = "Successfully added $bloodType with $quantity units";
+                    }
                     $success = true;
-                } else {
-                    $insertSql = "INSERT INTO bloodinventory (userID, bloodType, quantity) VALUES (?, ?, ?)";
-                    $insertStmt = $pdo->prepare($insertSql);
-                    $insertStmt->execute([$userID, $bloodType, $quantity]);
-                    $message = "Successfully added $bloodType with $quantity units";
-                    $success = true;
+                    
+                } elseif (isset($_POST['subtract'])) {
+                    // SUBTRACT operation
+                    if ($currentRecord) {
+                        $newQuantity = $currentRecord['quantity'] - $quantity;
+                        
+                        if ($newQuantity < 0) {
+                            $message = "Error: Cannot subtract $quantity units. Current stock is only {$currentRecord['quantity']} units";
+                        } else {
+                            $updateSql = "UPDATE bloodinventory SET quantity = ? WHERE bloodType = ? AND userID = ?";
+                            $updateStmt = $pdo->prepare($updateSql);
+                            $updateStmt->execute([$newQuantity, $bloodType, $userID]);
+                            $message = "Successfully subtracted $quantity units from $bloodType. New total: $newQuantity units";
+                            $success = true;
+                        }
+                    } else {
+                        $message = "Error: $bloodType not found in inventory. Cannot subtract from zero.";
+                    }
                 }
             } catch (PDOException $e) {
                 $message = "Error: " . $e->getMessage();
             }
         } else {
-            $message = "Please select blood type and enter valid quantity";
+            $message = "Please select blood type and enter valid quantity (greater than 0)";
         }
     }
 }
@@ -122,10 +144,34 @@ button {
     background: #fff;
     cursor: pointer;
     font-weight: 600;
+    margin-left: 5px;
 }
 
 button:hover {
     background: #f0f0f0;
+}
+
+button[name="add"] {
+    background: #d4edda;
+}
+
+button[name="add"]:hover {
+    background: #c3e6cb;
+}
+
+button[name="subtract"] {
+    background: #f8d7da;
+}
+
+button[name="subtract"]:hover {
+    background: #f5c6cb;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 /* TABLE */
@@ -154,7 +200,7 @@ th, td {
     </div>
 
     <?php if ($message): ?>
-        <p style="color: <?php echo $success ? 'green' : 'red'; ?>">
+        <p style="color: <?php echo $success ? 'green' : 'red'; ?>; font-weight: 600;">
             <?php echo $message; ?>
         </p>
     <?php endif; ?>
@@ -176,13 +222,14 @@ th, td {
 
         <br><br>
 
-        <label>Enter New Quantity:</label><br>
-        <input type="number" name="quantity" min="0" required>
+        <label>Enter Quantity:</label><br>
+        <input type="number" name="quantity" min="1" required>
 
         <br><br>
 
-        <div style="text-align:right;">
-            <button type="submit" name="update">Update</button>
+        <div class="button-group">
+            <button type="submit" name="add">➕ Add Units</button>
+            <button type="submit" name="subtract">➖ Subtract Units</button>
             <button type="button" onclick="window.location.href='hospital_dashboard.php'">
                 Cancel
             </button>
