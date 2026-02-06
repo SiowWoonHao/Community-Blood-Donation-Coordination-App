@@ -52,63 +52,157 @@ $result = mysqli_query($conn, $sql);
 <head>
 <meta charset="UTF-8">
 <title>Admin Feedback</title>
+
 <style>
-table { border-collapse: collapse; width: 100%; }
-th, td { border: 1px solid #000; padding: 8px; text-align: left; }
-th { background-color: #f2f2f2; }
-button { padding: 6px 12px; margin: 2px; cursor: pointer; }
-form.search-form { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; }
-form.search-form input[type=text] { padding: 6px; width: 200px; }
+/* ===== SAME GRADIENT AS OTHER ADMIN PAGES ===== */
+body{
+    margin:0;
+    min-height:100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(
+        120deg,
+        #f5f7fa,
+        #b8f7d4,
+        #9be7ff,
+        #c7d2fe,
+        #fef9c3
+    );
+    background-size: 400% 400%;
+    animation: gradientBG 12s ease infinite;
+}
+@keyframes gradientBG{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+/* ===== CONTAINER ===== */
+.container{
+    max-width:1200px;
+    margin:50px auto;
+    background:#fff;
+    padding:30px 40px;
+    border-radius:16px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.15);
+}
+
+/* ===== TOP BAR ===== */
+.top-bar{
+    border:2px solid #ccc;
+    padding:12px;
+    margin-bottom:20px;
+}
+
+/* ===== FILTER / SEARCH ROW ===== */
+.filter-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.filter-left{
+    display:flex;
+    gap:10px;
+}
+
+.filter-right input{
+    padding:8px;
+    width:220px;
+}
+
+/* ===== TABLE ===== */
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:left;
+}
+
+th{
+    background:#f2f2f2;
+}
+
+button{
+    padding:6px 12px;
+    cursor:pointer;
+}
 </style>
 </head>
+
 <body>
-<h2>Admin Feedback Dashboard</h2>
-<div class="back">
-    ← <a href="adminDashboard.php">Back to Dashboard</a>
+
+<div class="container">
+
+<h2>Feedback</h2>
+
+<div class="top-bar">
+    ← <a href="adminDashboard.php">Back to Admin Dashboard</a>
 </div>
-<form class="search-form" method="GET">
-    <label>Search:</label>
-    <input type="text" name="search" placeholder="Donor or Event" value="<?php echo htmlspecialchars($search); ?>">
-    <label>Filter by Feedback Status:</label>
-    <select name="feedbackStatus">
-        <option value="">All</option>
-        <option value="Pending" <?php echo $feedbackStatusFilter=='Pending'?'selected':''; ?>>Pending</option>
-        <option value="Replied" <?php echo $feedbackStatusFilter=='Replied'?'selected':''; ?>>Replied</option>
-        <option value="Resolved" <?php echo $feedbackStatusFilter=='Resolved'?'selected':''; ?>>Resolved</option>
-    </select>
-    <button type="submit">Search</button>
+
+<form method="GET">
+<div class="filter-row">
+
+    <div class="filter-left">
+        <select name="feedbackStatus">
+            <option value="">All</option>
+            <option value="Pending" <?= $feedbackStatusFilter=='Pending'?'selected':'' ?>>Pending</option>
+            <option value="Resolved" <?= $feedbackStatusFilter=='Resolved'?'selected':'' ?>>Resolved</option>
+            <option value="Replied" <?= $feedbackStatusFilter=='Replied'?'selected':'' ?>>Replied</option>
+        </select>
+    </div>
+
+    <div class="filter-right">
+        <input type="text"
+               name="search"
+               placeholder="Search feedback……"
+               value="<?= htmlspecialchars($search) ?>">
+    </div>
+
+</div>
 </form>
 
+<p>Showing feedback</p>
+
 <table>
-    <tr>
-        <th>Donor</th>
-        <th>Event</th>
-        <th>Rating</th>
-        <th>Comment</th>
-        <th>Rating Date</th>
-        <th>Feedback Status</th>
-        <th>Reply Comment</th>
-        <th>Reply Date</th>
-        <th>Action</th>
-    </tr>
-    <?php while ($row = mysqli_fetch_assoc($result)): ?>
-    <tr>
-        <td><?php echo htmlspecialchars($row['donorName']); ?></td>
-        <td><?php echo htmlspecialchars($row['eventName']); ?></td>
-        <td><?php echo $row['rating']; ?></td>
-        <td><?php echo htmlspecialchars($row['comment']); ?></td>
-        <td><?php echo $row['ratingDate'] ? date("Y-m-d H:i", strtotime($row['ratingDate'])) : ''; ?></td>
-        <td><?php echo htmlspecialchars($row['feedbackStatus']); ?></td>
-        <td><?php echo htmlspecialchars($row['replyComment']); ?></td>
-        <td><?php echo $row['replyDate'] ? date("Y-m-d H:i", strtotime($row['replyDate'])) : ''; ?></td>
-        <td>
-            <form method="GET" action="replyFeedback.php" style="display:inline;">
-                <input type="hidden" name="appointmentID" value="<?php echo $row['appointmentID']; ?>">
-                <button type="submit">Reply</button>
-            </form>
-        </td>
-    </tr>
-    <?php endwhile; ?>
+<tr>
+    <th>Donor</th>
+    <th>Event</th>
+    <th>Rating</th>
+    <th>Comment</th>
+    <th>Rating Date</th>
+    <th>Status</th>
+    <th>Reply Comment</th>
+    <th>Reply Date</th>
+    <th>Actions</th>
+</tr>
+
+<?php while ($row = mysqli_fetch_assoc($result)): ?>
+<tr>
+    <td><?= htmlspecialchars($row['donorName']) ?></td>
+    <td><?= htmlspecialchars($row['eventName']) ?></td>
+    <td><?= $row['rating'] ?></td>
+    <td><?= htmlspecialchars($row['comment']) ?></td>
+    <td><?= $row['ratingDate'] ? date("Y-m-d", strtotime($row['ratingDate'])) : '' ?></td>
+    <td><?= htmlspecialchars($row['feedbackStatus']) ?></td>
+    <td><?= htmlspecialchars($row['replyComment']) ?></td>
+    <td><?= $row['replyDate'] ? date("Y-m-d", strtotime($row['replyDate'])) : '' ?></td>
+    <td>
+        <form method="GET" action="replyFeedback.php">
+            <input type="hidden" name="appointmentID" value="<?= $row['appointmentID'] ?>">
+            <button type="submit">View</button>
+        </form>
+    </td>
+</tr>
+<?php endwhile; ?>
+
 </table>
+
+</div>
 </body>
 </html>
