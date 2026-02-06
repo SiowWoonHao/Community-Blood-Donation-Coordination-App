@@ -155,7 +155,6 @@ th, td{
         <b>Capacity:</b> <?php echo ($event['maxSlots'] - $event['availableSlots'])."/".$event['maxSlots']; ?> registered
     </div>
 
-    <button>Export to CSV</button>
 </div>
 
 <form method="GET" class="filters">

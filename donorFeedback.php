@@ -2,7 +2,6 @@
 session_start();
 include "db.php";
 
-// Login & role check
 if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != 'Donor') {
     header("Location: login.php");
     exit();
@@ -48,9 +47,20 @@ if (isset($_POST['submit'])) {
     $comment = mysqli_real_escape_string($conn, $_POST['comment']);
 
     $update = "UPDATE appointment 
-               SET rating='$rating', comment='$comment'
+               SET rating='$rating', comment='$comment', ratingDate=NOW()
                WHERE appointmentID='$appointmentID'";
     mysqli_query($conn, $update);
+
+    $checkFeedback = "SELECT * FROM feedback WHERE appointmentID='$appointmentID'";
+    $res = mysqli_query($conn, $checkFeedback);
+
+    if (mysqli_num_rows($res) == 0) {
+        $eventID = $data['eventID'];
+        $userID = $_SESSION['userID'];
+        $insertFeedback = "INSERT INTO feedback (userID, appointmentID, eventID, feedbackStatus) 
+                           VALUES ('$userID', '$appointmentID', '$eventID', 'Pending')";
+        mysqli_query($conn, $insertFeedback);
+    }
 
     echo "<script>
             alert('Thank you for your feedback!');
@@ -64,117 +74,36 @@ if (isset($_POST['submit'])) {
 <head>
 <meta charset="UTF-8">
 <title>Share Your Feedback</title>
-
 <style>
-* {
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-}
-
-/* 🌈 SAME ANIMATED GRADIENT */
+* {box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif;}
 body {
     margin: 0;
     min-height: 100vh;
-    background: linear-gradient(
-        120deg,
-        #f5f7fa,
-        #b8f7d4,
-        #9be7ff,
-        #c7d2fe,
-        #fef9c3
-    );
+    background: linear-gradient(120deg, #f5f7fa, #b8f7d4, #9be7ff, #c7d2fe, #fef9c3);
     background-size: 300% 300%;
     animation: gradientMove 18s ease infinite;
     padding: 40px;
 }
-
-@keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* MAIN CARD */
-.container {
-    max-width: 900px;
-    margin: auto;
-    background: #fff;
-    padding: 30px 35px;
-    border-radius: 16px;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-}
-
-/* HEADER */
-.header {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.back {
-    border: 1px solid #000;
-    padding: 12px;
-    width: 100%;
-}
-
-.back a {
-    text-decoration: none;
-    color: #000;
-    font-weight: 600;
-}
-
-/* FEEDBACK BOX */
-.feedback-box {
-    border: 1px solid #000;
-    padding: 20px;
-    margin-top: 20px;
-}
-
-.feedback-box h3 {
-    margin-top: 0;
-}
-
-/* FORM */
-textarea {
-    width: 100%;
-    height: 120px;
-    padding: 10px;
-    resize: none;
-}
-
-select {
-    padding: 6px;
-    margin-top: 5px;
-}
-
-/* BUTTONS */
-.actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-button {
-    padding: 10px 22px;
-    border: 1px solid #000;
-    background: #fff;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-button:hover {
-    background: #f0f0f0;
-}
+@keyframes gradientMove {0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }}
+.container {max-width: 900px; margin: auto; background: #fff; padding: 30px 35px; border-radius: 16px; box-shadow: 0 25px 50px rgba(0,0,0,0.25);}
+.header {display: flex; flex-direction: column; gap: 10px;}
+.back {border: 1px solid #000; padding: 12px; width: 100%;}
+.back a {text-decoration: none; color: #000; font-weight: 600;}
+.feedback-box {border: 1px solid #000; padding: 20px; margin-top: 20px;}
+.feedback-box h3 {margin-top: 0;}
+textarea {width: 100%; height: 120px; padding: 10px; resize: none;}
+select {padding: 6px; margin-top: 5px;}
+.actions {display: flex; justify-content: space-between; margin-top: 20px;}
+button {padding: 10px 22px; border: 1px solid #000; background: #fff; cursor: pointer; font-weight: 600;}
+button:hover {background: #f0f0f0;}
 </style>
 </head>
-
 <body>
 
 <div class="container">
 
     <div class="header">
         <h2>SHARE YOUR FEEDBACK</h2>
-
         <div class="back">
             ← <a href="donorProfile.php">Back to Dashboard</a>
         </div>
@@ -213,4 +142,3 @@ button:hover {
 
 </body>
 </html>
-

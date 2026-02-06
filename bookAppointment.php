@@ -180,15 +180,11 @@ if (isset($_POST['book'])) {
         <div class="slot-box">
             <p><b>Choose an available time slot</b></p>
 
-            <div class="slots">
-                <button type="button" onclick="selectTime('10:00')">10:00 - 10:20</button>
-                <button type="button" onclick="selectTime('10:20')">10:20 - 10:40</button>
-                <button type="button" onclick="selectTime('10:40')">10:40 - 11:00</button>
-                <button type="button" onclick="selectTime('11:00')">11:00 - 11:20</button>
-                <button type="button" onclick="selectTime('11:20')">11:20 - 11:40</button>
-            </div>
-
-            <input type="hidden" name="appointmentTime" id="appointmentTime" required>
+            <input type="time"
+           name="appointmentTime"
+           min="<?php echo substr($event['eventStartTime'], 0, 5); ?>"
+           max="<?php echo substr($event['eventEndTime'], 0, 5); ?>"
+           required>
         </div>
 
         <div style="text-align:center;">
