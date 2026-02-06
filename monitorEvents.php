@@ -7,9 +7,11 @@ $onlyFlagged = isset($_GET['onlyFlagged']) ? true : false;
 // Handle flag/unflag action
 if (isset($_GET['flag_action']) && isset($_GET['id'])) {
     $eventID = $_GET['id'];
-    $currentFlag = $_GET['flag_action']; // 'Flag' or 'Unflag'
+    $currentFlag = $_GET['flag_action'];
     $newFlag = ($currentFlag === 'Flag') ? 'Unflag' : 'Flag';
+
     $conn->query("UPDATE event SET flagStatus='$newFlag' WHERE eventID=$eventID");
+
     header("Location: monitorEvents.php?search=$search" . ($onlyFlagged ? "&onlyFlagged=1" : ""));
     exit;
 }
@@ -34,16 +36,23 @@ $events = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Monitor Events</title>
+<meta charset="UTF-8">
+<title>Monitor Events</title>
 
 <style>
 body {
     margin: 0;
     min-height: 100vh;
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(-45deg, #9ef0e1, #b8e7ff, #c6b8ff, #9ef0e1);
+    background: linear-gradient(
+        -45deg,
+        #9ef0e1,
+        #b8e7ff,
+        #c6b8ff,
+        #9ef0e1
+    );
     background-size: 400% 400%;
     animation: gradientBG 12s ease infinite;
 }
@@ -55,26 +64,34 @@ body {
 }
 
 .container {
-    background: white;
     width: 90%;
     max-width: 1300px;
     margin: 40px auto;
     padding: 30px 40px;
+    background: white;
     border-radius: 22px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
+/* ===== Header ===== */
+h1 {
+    margin-top: 0;
+}
+
 .back-link {
+    display: inline-block;
+    margin-bottom: 20px;
     color: #6a5cff;
     text-decoration: none;
     font-weight: 500;
 }
 
+/* ===== Filters ===== */
 .filter-bar {
     display: flex;
-    gap: 15px;
     align-items: center;
-    margin-bottom: 20px;
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 .filter-bar input[type="text"] {
@@ -86,6 +103,9 @@ body {
 
 .filter-bar label {
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .filter-bar button {
@@ -101,10 +121,10 @@ body {
     opacity: 0.85;
 }
 
+/* ===== Table ===== */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
 }
 
 th {
@@ -122,6 +142,7 @@ tr:hover {
     background: #f9f9ff;
 }
 
+/* ===== Buttons ===== */
 td button {
     padding: 6px 12px;
     border-radius: 8px;
@@ -138,17 +159,25 @@ td button:hover {
 </head>
 
 <body>
+
 <div class="container">
 
     <h1>Monitor Events</h1>
-    <p><a class="back-link" href="adminDashboard.php">← Back to Dashboard</a></p>
+    <a class="back-link" href="adminDashboard.php">← Back to Dashboard</a>
 
     <form method="GET" class="filter-bar">
-        <input type="text" name="search" placeholder="Search by name or venue" value="<?php echo htmlspecialchars($search); ?>">
+        <input
+            type="text"
+            name="search"
+            placeholder="Search by name or venue"
+            value="<?php echo htmlspecialchars($search); ?>"
+        >
+
         <label>
             <input type="checkbox" name="onlyFlagged" value="1" <?php echo $onlyFlagged ? 'checked' : ''; ?>>
             Only Flagged
         </label>
+
         <button type="submit">Search</button>
         <button type="button" onclick="window.location.href='monitorEvents.php'">Reset</button>
     </form>
@@ -169,7 +198,9 @@ td button:hover {
         </tr>
 
         <?php if (empty($events)): ?>
-            <tr><td colspan="11" style="text-align:center;">No events found.</td></tr>
+            <tr>
+                <td colspan="11" style="text-align:center;">No events found.</td>
+            </tr>
         <?php else: ?>
             <?php foreach ($events as $e): ?>
             <tr>
@@ -177,14 +208,22 @@ td button:hover {
                 <td><?php echo htmlspecialchars($e['eventName']); ?></td>
                 <td><?php echo htmlspecialchars($e['organizationName']); ?></td>
                 <td><?php echo $e['eventDate']; ?></td>
-                <td><?php echo date('H:i', strtotime($e['eventStartTime'])) . " - " . date('H:i', strtotime($e['eventEndTime'])); ?></td>
+                <td>
+                    <?php
+                        echo date('H:i', strtotime($e['eventStartTime'])) .
+                        " - " .
+                        date('H:i', strtotime($e['eventEndTime']));
+                    ?>
+                </td>
                 <td><?php echo htmlspecialchars($e['eventVenue']); ?></td>
                 <td><?php echo $e['availableSlots']; ?></td>
                 <td><?php echo $e['maxSlots']; ?></td>
                 <td><?php echo $e['status']; ?></td>
                 <td><?php echo $e['flagStatus'] ?? 'Unflag'; ?></td>
                 <td>
-                    <button onclick="window.location.href='viewEvent.php?id=<?php echo $e['eventID']; ?>'">View</button>
+                    <button onclick="window.location.href='viewEvent.php?id=<?php echo $e['eventID']; ?>'">
+                        View
+                    </button>
                     <button onclick="window.location.href='monitorEvents.php?id=<?php echo $e['eventID']; ?>&flag_action=<?php echo ($e['flagStatus'] ?? 'Unflag'); ?>&search=<?php echo urlencode($search); ?><?php echo $onlyFlagged ? '&onlyFlagged=1' : ''; ?>'">
                         <?php echo ($e['flagStatus'] ?? 'Unflag') === 'Flag' ? 'Unflag' : 'Flag'; ?>
                     </button>
@@ -195,5 +234,6 @@ td button:hover {
     </table>
 
 </div>
+
 </body>
 </html>
