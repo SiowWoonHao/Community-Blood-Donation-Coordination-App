@@ -159,10 +159,6 @@ $result = mysqli_query($conn, $sql);
                         <?= $row['availableSlots'] ?>/<?= $row['maxSlots'] ?>
                     </div>
 
-                    <button onclick="window.location.href='eventDetails.php?eventID=<?= $row['eventID'] ?>'">
-                        View Details
-                    </button>
-
                     <?php if ($row['availableSlots'] > 0) { ?>
                         <button onclick="window.location.href='bookAppointment.php?eventID=<?= $row['eventID'] ?>'">
                             Book Now
