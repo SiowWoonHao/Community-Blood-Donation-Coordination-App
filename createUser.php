@@ -58,91 +58,120 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_user'])) {
 <title>Create User Account</title>
 
 <style>
-body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(-45deg, #9ef0e1, #b8e7ff, #c6b8ff, #9ef0e1);
-    background-size: 400% 400%;
+/* ===== SAME ADMIN GRADIENT ===== */
+body{
+    margin:0;
+    min-height:100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(
+        120deg,
+        #f5f7fa,
+        #b8f7d4,
+        #9be7ff,
+        #c7d2fe,
+        #fef9c3
+    );
+    background-size:400% 400%;
     animation: gradientBG 12s ease infinite;
 }
-
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+@keyframes gradientBG{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
 }
 
-.container {
-    background: white;
-    width: 90%;
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 35px 45px;
-    border-radius: 22px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+/* ===== CONTAINER ===== */
+.container{
+    max-width:900px;
+    margin:60px auto;
+    background:#fff;
+    padding:35px 45px;
+    border-radius:16px;
+    box-shadow:0 15px 30px rgba(0,0,0,0.2);
 }
 
-.back-link {
-    color: #6a5cff;
-    text-decoration: none;
-    font-weight: 500;
+/* ===== BACK BAR ===== */
+.top-bar{
+    border:2px solid #ccc;
+    padding:12px;
+    margin-bottom:25px;
+}
+.top-bar a{
+    text-decoration:none;
+    color:#000;
+    font-weight:500;
 }
 
-.form-group {
-    margin-bottom: 20px;
+/* ===== FORM ===== */
+.form-group{
+    margin-bottom:18px;
 }
 
-label {
-    font-weight: 500;
-    display: block;
-    margin-bottom: 6px;
+label{
+    font-weight:600;
+    display:block;
+    margin-bottom:6px;
 }
 
-input, select {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 15px;
+input, select{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    font-size:14px;
 }
 
-input:focus, select:focus {
-    outline: none;
-    border-color: #6a5cff;
+input:focus, select:focus{
+    outline:none;
+    border-color:#6a5cff;
 }
 
-.btn {
-    padding: 10px 22px;
-    border-radius: 10px;
-    border: none;
-    background: #6a5cff;
-    color: white;
-    font-size: 15px;
-    cursor: pointer;
+/* ===== BUTTONS ===== */
+.btn{
+    padding:10px 22px;
+    border-radius:10px;
+    border:none;
+    background:#6a5cff;
+    color:white;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
 }
 
-.btn.secondary {
-    background: #ddd;
-    color: #333;
+.btn.secondary{
+    background:#ddd;
+    color:#333;
 }
 
-.btn:hover {
-    opacity: 0.85;
+.btn:hover{
+    opacity:0.85;
 }
 
-.message {
-    font-weight: bold;
-    margin-bottom: 20px;
+/* ===== MESSAGE ===== */
+.message{
+    font-weight:600;
+    margin-bottom:20px;
+}
+
+/* ===== FOOT INFO ===== */
+.role-info{
+    margin-top:30px;
+    background:#f9f9ff;
+    padding:20px;
+    border-radius:12px;
 }
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
-<h1>Create User Account</h1>
-<p><a class="back-link" href="manageUsers.php">← Back to Manage Users</a></p>
+<h2>Create User Account</h2>
+
+<div class="top-bar">
+    ← <a href="manageUsers.php">Back to Manage Users</a>
+</div>
 
 <?php if ($message): ?>
 <p class="message" style="color: <?= $success ? 'green' : 'red'; ?>">
@@ -153,24 +182,24 @@ input:focus, select:focus {
 <form method="POST">
 
 <div class="form-group">
-    <label>Full Name*</label>
-    <input type="text" name="userName" 
+    <label>Full Name *</label>
+    <input type="text" name="userName"
            value="<?= htmlspecialchars($_POST['userName'] ?? ''); ?>" required>
 </div>
 
 <div class="form-group">
-    <label>Username / Email*</label>
-    <input type="email" name="userEmail" 
+    <label>Username / Email *</label>
+    <input type="email" name="userEmail"
            value="<?= htmlspecialchars($_POST['userEmail'] ?? ''); ?>" required>
 </div>
 
 <div class="form-group">
-    <label>Password*</label>
+    <label>Password *</label>
     <input type="password" name="userPassword" required>
 </div>
 
 <div class="form-group">
-    <label>Role</label>
+    <label>Role *</label>
     <select name="userRole" required>
         <option value="">-- Select Role --</option>
         <option value="Admin" <?= ($_POST['userRole'] ?? '') === 'Admin' ? 'selected' : '' ?>>Admin</option>
@@ -181,6 +210,7 @@ input:focus, select:focus {
 </div>
 
 <br>
+
 <button type="submit" name="create_user" class="btn">Create Account</button>
 <button type="button" onclick="window.location.href='manageUsers.php'" class="btn secondary">
     Cancel
@@ -188,16 +218,17 @@ input:focus, select:focus {
 
 </form>
 
-<hr style="margin:40px 0;">
-
-<h3>User Role Descriptions:</h3>
-<ul>
-    <li><strong>Admin</strong> - Full system access, can manage all users and settings</li>
-    <li><strong>Donor</strong> - Can register for blood donation events</li>
-    <li><strong>Hospital</strong> - Can manage blood inventory</li>
-    <li><strong>Event Organizer</strong> - Can create and manage events</li>
-</ul>
+<div class="role-info">
+    <h4>User Role Descriptions</h4>
+    <ul>
+        <li><strong>Admin</strong> – Full system access, manage users & settings</li>
+        <li><strong>Donor</strong> – Register and participate in donation events</li>
+        <li><strong>Hospital</strong> – Manage blood inventory</li>
+        <li><strong>Event Organizer</strong> – Create and manage events</li>
+    </ul>
+</div>
 
 </div>
+
 </body>
 </html>
