@@ -31,7 +31,6 @@ if (isset($_POST['updateProfile'])) {
     $weight     = $_POST['donorWeight'];
     $bloodType  = $_POST['donorBloodType'];
 
-    // Build update query
     $updateSql = "UPDATE user SET
                     userPassword = '$password',
                     userEmail = '$email',
@@ -57,31 +56,104 @@ if (isset($_POST['updateProfile'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Edit Donor Profile</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            width: 500px;
-            margin: auto;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-        input, select {
-            width: 100%;
-            padding: 6px;
-        }
-        button {
-            margin-top: 15px;
-            padding: 8px 15px;
-            cursor: pointer;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Edit Donor Profile</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* 🌈 SAME GRADIENT */
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 40px;
+    background: linear-gradient(
+        120deg,
+        #f5f7fa,
+        #b8f7d4,
+        #9be7ff,
+        #c7d2fe,
+        #fef9c3
+    );
+    background-size: 300% 300%;
+    animation: gradientMove 18s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* CARD */
+.container {
+    width: 520px;
+    margin: auto;
+    background: #fff;
+    padding: 35px 30px;
+    border-radius: 18px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+}
+
+/* FORM */
+h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #6a5cff;
+}
+
+/* BUTTON */
+button {
+    margin-top: 20px;
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid #000;
+    background: #fff;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #f0f0f0;
+}
+
+/* BACK LINK */
+.back {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.back a {
+    text-decoration: none;
+    color: #000;
+}
+</style>
 </head>
+
 <body>
 
 <div class="container">
@@ -94,15 +166,15 @@ if (isset($_POST['updateProfile'])) {
         <input type="password" name="userPassword" required>
 
         <label>Email</label>
-        <input type="email" name="userEmail" 
+        <input type="email" name="userEmail"
                value="<?php echo $user['userEmail']; ?>" required>
 
         <label>Phone</label>
-        <input type="text" name="userPhone" 
+        <input type="text" name="userPhone"
                value="<?php echo $user['userPhone']; ?>" required>
 
         <label>Age</label>
-        <input type="number" name="donorAge" 
+        <input type="number" name="donorAge"
                value="<?php echo $user['donorAge']; ?>" required>
 
         <label>Gender</label>
@@ -112,11 +184,11 @@ if (isset($_POST['updateProfile'])) {
         </select>
 
         <label>Height (cm)</label>
-        <input type="number" name="donorHeight" 
+        <input type="number" name="donorHeight"
                value="<?php echo $user['donorHeight']; ?>" required>
 
         <label>Weight (kg)</label>
-        <input type="number" name="donorWeight" 
+        <input type="number" name="donorWeight"
                value="<?php echo $user['donorWeight']; ?>" required>
 
         <label>Blood Type</label>
@@ -136,8 +208,9 @@ if (isset($_POST['updateProfile'])) {
 
     </form>
 
-    <br>
-    <a href="donorProfile.php">← Back to Profile</a>
+    <div class="back">
+        <a href="donorProfile.php">← Back to Profile</a>
+    </div>
 
 </div>
 
