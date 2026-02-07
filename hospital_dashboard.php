@@ -75,13 +75,19 @@ body {
 .dashboard button:hover {
     background: #f0f0f0;
 }
+.dashboard-logo {
+    height: 50px;
+    padding: 6px;
+    border-radius: 8px;
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="dashboard">
-
+    <img src="logo.png" class="dashboard-logo">
     <h1>Hospital Dashboard</h1>
    
      <div class="header-right">

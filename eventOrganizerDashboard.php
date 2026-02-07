@@ -168,6 +168,12 @@ table td{
 .action-btn:hover{
     background:#eee;
 }
+.dashboard-logo {
+    height: 50px;
+    padding: 6px;
+    border-radius: 8px;
+}
+
 </style>
 </head>
 
@@ -176,6 +182,7 @@ table td{
 <div class="page-container">
 
 <div class="top-bar">
+    <img src="logo.png" class="dashboard-logo">
     <h2>My Event</h2>
     <div class="top-actions">
         <form action="logout.php" method="post" style="display:inline;">

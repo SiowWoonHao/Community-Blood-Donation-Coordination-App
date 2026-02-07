@@ -123,6 +123,11 @@ body {
     transform: translateY(-6px);
     box-shadow: 0 18px 35px rgba(0,0,0,0.25);
 }
+.dashboard-logo {
+    height: 50px;
+    padding: 6px; 
+    border-radius: 8px;
+}
 </style>
 </head>
 
@@ -140,6 +145,7 @@ foreach ($notifications as $msg) {
     <!-- HEADER -->
     <div class="header">
         <div class="header-left">
+            <img src="logo.png" class="dashboard-logo">
             <h1>DONOR DASHBOARD</h1>
             <p><?php echo $_SESSION['userName']; ?></p>
         </div>

@@ -108,6 +108,12 @@ body {
     transform: translateY(-6px);
     box-shadow: 0 28px 50px rgba(0,0,0,0.25);
 }
+.dashboard-logo {
+    height: 50px;
+    padding: 6px;
+    border-radius: 8px;
+}
+
 </style>
 </head>
 
@@ -117,6 +123,7 @@ body {
 
     <!-- HEADER -->
     <div class="dashboard-header">
+        <img src="logo.png" class="dashboard-logo">
         <h1>ADMIN DASHBOARD</h1>
         <button class="logout-btn" onclick="window.location.href='logout.php'">
             Logout
