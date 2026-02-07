@@ -175,15 +175,15 @@ table td{
 
 <div class="page-container">
 
-    <div class="top-bar">
-        <h2>My Event</h2>
-        <div class="top-actions">
-            <button>Notification</button>
-            <form action="logout.php" method="post" style="display:inline;">
-                <button type="submit">Logout</button>
-            </form>
-        </div>
+<div class="top-bar">
+    <h2>My Event</h2>
+    <div class="top-actions">
+        <form action="logout.php" method="post" style="display:inline;">
+            <button type="submit">Logout</button>
+        </form>
     </div>
+</div>
+
 
     <!-- Filter & Search -->
     <form method="GET" class="filter-bar">
