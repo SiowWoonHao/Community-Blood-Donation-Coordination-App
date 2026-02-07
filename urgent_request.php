@@ -1,41 +1,82 @@
 <?php
-// Urgent Blood Request Page
-$host = 'localhost';
-$dbname = 'cbdcdatabase';
-$username = 'root';
-$password = '';
+session_start();
+include "db.php";
 
 $message = '';
 $success = false;
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['submit_request'])) {
-        $bloodType = $_POST['bloodType'] ?? '';
-        $quantity = $_POST['quantity'] ?? '';
-        $priority = $_POST['priority'] ?? '3';
-        $reason = $_POST['reason'] ?? '';
-        $userID = 1;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_request'])) {
 
-        if (!empty($bloodType) && is_numeric($quantity) && $quantity > 0 && !empty($reason)) {
-            try {
-                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $bloodType = $_POST['bloodType'] ?? '';
+    $quantity  = $_POST['quantity'] ?? '';
+    $priority  = $_POST['priority'] ?? '3';
+    $reason    = $_POST['reason'] ?? '';
+    $userID    = $_SESSION['userID'] ?? 1;
 
-                $sql = "INSERT INTO bloodrequest 
-                        (userID, quantity, bloodType, priority, reason, requestDate) 
-                        VALUES (?, ?, ?, ?, ?, ?)";
+    if ($bloodType !== '' && is_numeric($quantity) && $quantity > 0 && $reason !== '') {
 
-                $requestDate = date('Y-m-d');
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$userID, $quantity, $bloodType, $priority, $reason, $requestDate]);
+        $bloodTypeEscaped = mysqli_real_escape_string($conn, $bloodType);
+        $reasonEscaped    = mysqli_real_escape_string($conn, $reason);
+        $requestDate      = date('Y-m-d');
 
-                $success = true;
-            } catch (PDOException $e) {
-                $message = "Error: " . $e->getMessage();
-            }
+        $insertRequest = "
+            INSERT INTO bloodrequest
+            (userID, quantity, bloodType, priority, reason, requestDate)
+            VALUES
+            ('$userID', '$quantity', '$bloodTypeEscaped', '$priority', '$reasonEscaped', '$requestDate')
+        ";
+
+        mysqli_query($conn, $insertRequest);
+
+        if ($bloodType === 'ALL') {
+
+            $donorSql = "
+                SELECT userID
+                FROM user
+                WHERE userRole = 'Donor'
+            ";
+
+            $notifMessage = mysqli_real_escape_string(
+                $conn,
+                "Urgent blood request (ALL blood types): $quantity units needed. Reason: $reason"
+            );
+
         } else {
-            $message = "Please fill all fields: blood type, quantity (> 0), and reason";
+
+            $donorSql = "
+                SELECT userID
+                FROM user
+                WHERE userRole = 'Donor'
+                AND donorBloodType = '$bloodTypeEscaped'
+            ";
+
+            $notifMessage = mysqli_real_escape_string(
+                $conn,
+                "Urgent blood request for $bloodType: $quantity units needed. Reason: $reason"
+            );
         }
+
+        $donorResult = mysqli_query($conn, $donorSql);
+
+        while ($donor = mysqli_fetch_assoc($donorResult)) {
+
+            $donorID = $donor['userID'];
+
+            $insertNotification = "
+                INSERT INTO notification
+                (userID, eventID, feedbackID, notificationDate, message)
+                VALUES
+                ('$donorID', NULL, NULL, NOW(), '$notifMessage')
+            ";
+
+            mysqli_query($conn, $insertNotification);
+        }
+
+        $success = true;
+        $message = "Urgent blood request submitted successfully.";
+
+    } else {
+        $message = "Please fill in all required fields correctly.";
     }
 }
 ?>
@@ -51,8 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, sans-serif;
 }
-
-/* 🌈 SAME GRADIENT */
 body {
     margin: 0;
     min-height: 100vh;
@@ -68,14 +107,11 @@ body {
     background-size: 300% 300%;
     animation: gradientMove 18s ease infinite;
 }
-
 @keyframes gradientMove {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
-
-/* CARD */
 .card {
     max-width: 800px;
     margin: auto;
@@ -84,32 +120,24 @@ body {
     border-radius: 18px;
     box-shadow: 0 25px 50px rgba(0,0,0,0.25);
 }
-
-/* TOP BAR */
 .top-bar {
     border: 1px solid #000;
     padding: 12px 16px;
     margin-bottom: 25px;
 }
-
 .top-bar a {
     text-decoration: none;
     color: black;
     font-weight: 500;
 }
-
-/* FORM */
 label {
     font-weight: 600;
 }
-
 select, input, textarea {
     padding: 8px 10px;
     margin-top: 6px;
     border: 1px solid #000;
 }
-
-/* BUTTONS */
 button {
     padding: 10px 20px;
     border: 1px solid #000;
@@ -117,18 +145,14 @@ button {
     cursor: pointer;
     font-weight: 600;
 }
-
 button:hover {
     background: #f0f0f0;
 }
-
-/* TABLE */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
 }
-
 th, td {
     border: 1px solid #000;
     padding: 8px;
@@ -148,8 +172,8 @@ th, td {
     </div>
 
     <?php if ($message): ?>
-        <p style="color: <?php echo $success ? 'green' : 'red'; ?>">
-            <?php echo $message; ?>
+        <p style="color: <?= $success ? 'green' : 'red'; ?>">
+            <?= $message; ?>
         </p>
     <?php endif; ?>
 
@@ -158,6 +182,7 @@ th, td {
         <label>Select Blood Type:</label><br>
         <select name="bloodType" required>
             <option value="">-- Select --</option>
+            <option value="ALL">ALL</option>
             <option value="O+">O+</option>
             <option value="A+">A+</option>
             <option value="B+">B+</option>
@@ -177,24 +202,21 @@ th, td {
 
         <label>Priority:</label><br>
         <select name="priority" required>
-            <option value="3">High (Critical)</option>
-            <option value="2">Medium (Urgent)</option>
-            <option value="1">Low (Normal)</option>
+            <option value="3">High</option>
+            <option value="2">Medium</option>
+            <option value="1">Low</option>
         </select>
 
         <br><br>
 
         <label>Reason:</label><br>
-        <textarea name="reason" rows="4" required
-                  placeholder="Enter reason for blood request..."></textarea>
+        <textarea name="reason" rows="4" required></textarea>
 
         <br><br>
 
         <div style="text-align:right;">
             <button type="submit" name="submit_request">Submit Request</button>
-            <button type="button" onclick="window.location.href='hospital_dashboard.php'">
-                Cancel
-            </button>
+            <button type="button" onclick="window.location.href='hospital_dashboard.php'">Cancel</button>
         </div>
 
     </form>
@@ -204,48 +226,46 @@ th, td {
     <h3>Recent Blood Requests</h3>
 
     <?php
-    try {
-        $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-        $sql = "SELECT * FROM bloodrequest ORDER BY requestDate DESC, requestID DESC LIMIT 10";
-        $stmt = $pdo->query($sql);
-        $requests = $stmt->fetchAll();
+    $recentSql = "
+        SELECT *
+        FROM bloodrequest
+        ORDER BY requestDate DESC, requestID DESC
+        LIMIT 10
+    ";
+    $recentResult = mysqli_query($conn, $recentSql);
 
-        if (empty($requests)) {
-            echo "<p>No recent requests found.</p>";
-        } else {
-            echo "<table>";
-            echo "<tr>
-                    <th>Blood Type</th>
-                    <th>Units</th>
-                    <th>Priority</th>
-                    <th>Date</th>
-                    <th>Reason</th>
-                  </tr>";
+    if (mysqli_num_rows($recentResult) === 0) {
+        echo "<p>No recent requests found.</p>";
+    } else {
+        echo "<table>";
+        echo "<tr>
+                <th>Blood Type</th>
+                <th>Units</th>
+                <th>Priority</th>
+                <th>Date</th>
+                <th>Reason</th>
+              </tr>";
 
-            foreach ($requests as $req) {
-                switch ($req['priority']) {
-                    case 1: $pText='Low'; $pColor='green'; break;
-                    case 2: $pText='Medium'; $pColor='orange'; break;
-                    case 3: $pText='High'; $pColor='red'; break;
-                    default: $pText='Unknown'; $pColor='gray';
-                }
+        while ($row = mysqli_fetch_assoc($recentResult)) {
 
-                $shortReason = strlen($req['reason']) > 50
-                    ? substr($req['reason'], 0, 50) . '...'
-                    : $req['reason'];
-
-                echo "<tr>";
-                echo "<td>{$req['bloodType']}</td>";
-                echo "<td>{$req['quantity']} units</td>";
-                echo "<td style='color:$pColor; font-weight:bold;'>$pText</td>";
-                echo "<td>{$req['requestDate']}</td>";
-                echo "<td title=\"" . htmlspecialchars($req['reason']) . "\">$shortReason</td>";
-                echo "</tr>";
+            if ($row['priority'] == 3) {
+                $pText = 'High';
+            } elseif ($row['priority'] == 2) {
+                $pText = 'Medium';
+            } else {
+                $pText = 'Low';
             }
-            echo "</table>";
+
+            echo "<tr>";
+            echo "<td>{$row['bloodType']}</td>";
+            echo "<td>{$row['quantity']}</td>";
+            echo "<td>$pText</td>";
+            echo "<td>{$row['requestDate']}</td>";
+            echo "<td>" . htmlspecialchars($row['reason']) . "</td>";
+            echo "</tr>";
         }
-    } catch (PDOException $e) {
-        echo "<p>Error loading requests: " . $e->getMessage() . "</p>";
+
+        echo "</table>";
     }
     ?>
 

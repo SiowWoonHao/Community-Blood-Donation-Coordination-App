@@ -2,8 +2,8 @@
 session_start();
 include "db.php";
 
-if (!isset($_SESSION['userID']) || $_SESSION['userRole'] != "Organizer") {
-    echo "<script>alert('Access denied!'); window.location.href='login.php';</script>";
+if (!isset($_SESSION['userID']) || $_SESSION['userRole'] !== "Organizer") {
+    echo "<script>alert('Access denied'); window.location.href='login.php';</script>";
     exit();
 }
 
@@ -13,12 +13,12 @@ if (!isset($_GET['eventID'])) {
 }
 
 $eventID = $_GET['eventID'];
-$userID = $_SESSION['userID'];
+$userID  = $_SESSION['userID'];
 
 $sql = "SELECT * FROM event WHERE eventID = '$eventID' AND userID = '$userID'";
 $result = mysqli_query($conn, $sql);
 
-if (mysqli_num_rows($result) != 1) {
+if (mysqli_num_rows($result) !== 1) {
     echo "<script>alert('Event not found'); window.location.href='eventOrganizerDashboard.php';</script>";
     exit();
 }
@@ -26,16 +26,55 @@ if (mysqli_num_rows($result) != 1) {
 $event = mysqli_fetch_assoc($result);
 
 if (isset($_POST['updateStatus'])) {
-    $status = $_POST['status'];
 
-    $update = "UPDATE event SET status = '$status'
-               WHERE eventID = '$eventID' AND userID = '$userID'";
+    $newStatus = $_POST['status'];
+    $oldStatus = $event['status'];
+
+    $update = "
+        UPDATE event 
+        SET status = '$newStatus'
+        WHERE eventID = '$eventID' AND userID = '$userID'
+    ";
 
     if (mysqli_query($conn, $update)) {
+
+        if ($oldStatus !== 'Cancelled' && $newStatus === 'Cancelled') {
+
+            $eventNameEscaped = mysqli_real_escape_string($conn, $event['eventName']);
+
+            $donorSql = "
+                SELECT DISTINCT userID
+                FROM appointment
+                WHERE eventID = '$eventID'
+            ";
+
+            $donorResult = mysqli_query($conn, $donorSql);
+
+            while ($donor = mysqli_fetch_assoc($donorResult)) {
+
+                $donorID = $donor['userID'];
+
+                $message = mysqli_real_escape_string(
+                    $conn,
+                    "Your appointment for event \"$eventNameEscaped\" has been cancelled by the organizer."
+                );
+
+                $insertNotification = "
+                    INSERT INTO notification
+                    (userID, eventID, feedbackID, notificationDate, message)
+                    VALUES
+                    ('$donorID', '$eventID', NULL, NOW(), '$message')
+                ";
+
+                mysqli_query($conn, $insertNotification);
+            }
+        }
+
         echo "<script>
-                alert('Event status updated');
+                alert('Event status updated successfully');
                 window.location.href='eventOrganizerDashboard.php';
               </script>";
+        exit();
     }
 }
 ?>
@@ -50,7 +89,6 @@ if (isset($_POST['updateStatus'])) {
             margin: 0;
             min-height: 100vh;
             font-family: Arial, sans-serif;
-
             background: linear-gradient(
                 -45deg,
                 #f5f7fa,
@@ -88,10 +126,6 @@ if (isset($_POST['updateStatus'])) {
             margin: 15px 0 30px;
         }
 
-        .radio-group {
-            margin: 15px 0 25px;
-        }
-
         .radio-group label {
             display: block;
             margin: 10px 0;
@@ -102,11 +136,6 @@ if (isset($_POST['updateStatus'])) {
             border: 1px solid #000;
             padding: 15px;
             margin: 20px 0;
-        }
-
-        .warning-box strong {
-            display: block;
-            margin-bottom: 8px;
         }
 
         .button-row {
@@ -138,10 +167,10 @@ if (isset($_POST['updateStatus'])) {
 
     <h2>Manage Event Status</h2>
 
-    <p><strong>Event:</strong> <?php echo $event['eventName']; ?></p>
+    <p><strong>Event:</strong> <?= htmlspecialchars($event['eventName']); ?></p>
 
     <div class="status-box">
-        <strong>Current Status:</strong> <?php echo $event['status']; ?>
+        <strong>Current Status:</strong> <?= $event['status']; ?>
     </div>
 
     <form method="POST">
@@ -151,26 +180,26 @@ if (isset($_POST['updateStatus'])) {
         <div class="radio-group">
             <label>
                 <input type="radio" name="status" value="Published"
-                    <?php if ($event['status']=="Published") echo "checked"; ?>>
+                    <?= $event['status'] === "Published" ? "checked" : ""; ?>>
                 Publish
             </label>
 
             <label>
                 <input type="radio" name="status" value="Cancelled"
-                    <?php if ($event['status']=="Cancelled") echo "checked"; ?>>
+                    <?= $event['status'] === "Cancelled" ? "checked" : ""; ?>>
                 Cancel Event
             </label>
         </div>
 
         <div class="warning-box">
-            <strong>⚠ Warning:</strong>
-            Community blood drive for public donors may be affected by this action.
+            <strong>Warning:</strong>
+            Cancelling this event will notify all registered donors.
         </div>
 
         <div class="button-row">
             <button type="submit" name="updateStatus">Confirm</button>
             <a href="eventOrganizerDashboard.php">
-                <button type="button">Cancel</button>
+                <button type="button">Back</button>
             </a>
         </div>
 
@@ -180,4 +209,3 @@ if (isset($_POST['updateStatus'])) {
 
 </body>
 </html>
-
