@@ -101,12 +101,20 @@ body{
 .logout button:hover{
     background:#fee2e2;
 }
+.dashboard-logo {
+    height: 50px;
+    padding: 6px;
+    border-radius: 8px;
+}
 </style>
 </head>
 
 <body>
 
 <div class="dashboard">
+<div class="header">
+    <div class="header-left">
+        <img src="logo.png" class="dashboard-logo">
 
     <h1>Hospital Dashboard</h1>
 
